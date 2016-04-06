@@ -62,6 +62,11 @@ db.on('open', () => {
     res.render('index');
   });
 
+  app.get('/version', (req, res) => {
+    res.set('Content-Type', 'text/plain');
+    res.sendFile(path.resolve(__dirname, 'VERSION'));
+  })
+
   // Socket.IO Middlewares
   io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next)

@@ -1,6 +1,7 @@
 
 import GitRepo from 'git-repository';
 import run from './run';
+import fs from './lib/fs';
 
 const remote = {
   name: 'heroku',
@@ -13,6 +14,8 @@ const remote = {
 async function deploy() {
   const env = 'staging';
   process.argv.push('--staging');
+
+  await fs.makeDir(`build/${env}`);
 
   // Initialize a new Git repository in the build directory if it doesn't exist
   const repo = await GitRepo.open(`build/${env}`, { init: true });
