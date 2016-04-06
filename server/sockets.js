@@ -18,9 +18,11 @@ function sockets(server) {
       }
       session.save();
 
-      io.emit('chat message',`[${session.messages}] ${socket.id}: ${message}`);
+      let name = session.fb.name || socket.id;
+
+      io.emit('chat message',`[${session.messages}] ${name}: ${message}`);
     });
-  })
+  });
 
   return io;
 }

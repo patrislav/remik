@@ -14,7 +14,7 @@ function runServer(cb) {
     const time = new Date().toTimeString();
     const match = data.toString('utf8').match(RUNNING_REGEXP);
 
-    process.stdout.write(time.replace(/.*(\d{2}:\d{2}:\d{2}).*/, '[$1] '));
+    // process.stdout.write(time.replace(/.*(\d{2}:\d{2}:\d{2}).*/, '[$1] '));
     process.stdout.write(data);
 
     if (match) {
@@ -30,7 +30,7 @@ function runServer(cb) {
     server.kill('SIGTERM');
   }
 
-  server = cp.spawn('npm', ['start'], {
+  server = cp.spawn(path.resolve(__dirname, '../node_modules/.bin/nf'), ['start'], {
     cwd: path.resolve(__dirname, `../build/${NODE_ENV}`),
     env: process.env,
     silent: false,

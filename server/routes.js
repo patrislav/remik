@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import config from './config';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/version', (req, res) => {
 // Facebook sends a POST request when loading the iframe for the first time
 // that's why it needs to be caught too.
 function fbCanvas(req, res) {
-  res.render('canvas/fb');
+  res.render('canvas/fb', { config: config });
 }
 router.get('/canvas/fb', fbCanvas);
 router.post('/canvas/fb', fbCanvas);
