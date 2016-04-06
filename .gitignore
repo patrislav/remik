@@ -8,3 +8,7 @@ node_modules
 
 # The build directory
 /build
+
+# Environment variables
+/tools/env/*
+!/tools/env/.keep
