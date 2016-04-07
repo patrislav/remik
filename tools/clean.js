@@ -7,7 +7,7 @@ import fs from './lib/fs';
  */
 async function clean() {
   const NODE_ENV = process.env.NODE_ENV;
-  await del([`build/${NODE_ENV}/*`], { dot: true });
+  await del([`build/${NODE_ENV}/*`, `!build/${NODE_ENV}/.git`], { dot: true });
   await fs.makeDir(`build/${NODE_ENV}/public`);
 }
 

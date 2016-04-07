@@ -13,16 +13,16 @@ const remote = {
 }
 
 async function deploy() {
-  const env = (process.argv.includes('--staging') ? 'staging' : 'development');
+  const NODE_ENV = process.env.NODE_ENV;
 
-  await fs.makeDir(`build/${env}`);
+  await fs.makeDir(`build/${NODE_ENV}`);
 
   // Initialize a new Git repository in the build directory if it doesn't exist
-  const repo = await GitRepo.open(`build/${env}`, { init: true });
-  await repo.setRemote(remote.name, remote.repoUrl[env]);
+  const repo = await GitRepo.open(`build/${NODE_ENV}`, { init: true });
+  await repo.setRemote(remote.name, remote.repoUrl[NODE_ENV]);
 
   // Fetch the remote repository if it exists
-  if ((await repo.hasRef(remote.repoUrl[env], 'master'))) {
+  if ((await repo.hasRef(remote.repoUrl[NODE_ENV], 'master'))) {
     await repo.fetch(remote.name);
     await repo.reset(`${remote.name}/master`, { hard: true });
     await repo.clean({ force: true });
