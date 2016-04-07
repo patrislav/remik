@@ -5,10 +5,10 @@ import Promise from 'bluebird';
 import dateformat from 'dateformat';
 import fs from './lib/fs';
 import pkg from '../package.json';
-import NODE_ENV from './lib/environment';
 
 async function copy() {
   const ncp = require('ncp');
+  const NODE_ENV = process.env.NODE_ENV;
 
   ncp('./tools/build-default', `./build/${NODE_ENV}`);
   ncp(`./tools/env/${NODE_ENV}.env`, `./build/${NODE_ENV}/.env`);

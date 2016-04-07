@@ -7,13 +7,13 @@ const remote = {
   name: 'heroku',
   repoUrl: {
     production: 'https://git.heroku.com/remik.git',
-    staging: 'https://git.heroku.com/remik-staging.git'
+    staging: 'https://git.heroku.com/remik-staging.git',
+    development: 'https://git.heroku.com/remik-development.git'
   }
 }
 
 async function deploy() {
-  const env = 'staging';
-  process.argv.push('--staging');
+  const env = (process.argv.includes('--staging') ? 'staging' : 'development');
 
   await fs.makeDir(`build/${env}`);
 

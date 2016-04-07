@@ -2,10 +2,10 @@ import path from 'path';
 import webpack from 'webpack';
 import extend from 'extend';
 import fs from 'fs';
-import NODE_ENV from './lib/environment';
 
+const NODE_ENV = process.env.NODE_ENV;
 const VERBOSE = process.argv.includes('--verbose');
-const DEBUG = NODE_ENV === 'development';
+const DEBUG = (NODE_ENV === 'development');
 const GLOBALS = {
   __DEV__: DEBUG
 }

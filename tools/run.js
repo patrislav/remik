@@ -12,6 +12,11 @@ function format(time) {
 }
 
 function run(fn, options) {
+  const availableEnvs = ['development', 'staging'];
+  if (!availableEnvs.includes(process.env.NODE_ENV)) {
+    process.env.NODE_ENV = availableEnvs[0];
+  }
+
   const task = typeof fn.default === 'undefined' ? fn : fn.default;
   const start = new Date();
   console.log(

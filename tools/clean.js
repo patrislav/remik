@@ -1,13 +1,13 @@
 
 import del from 'del';
 import fs from './lib/fs';
-import NODE_ENV from './lib/environment';
 
 /**
  * Cleans up the output directory.
  */
 async function clean() {
-  await del([`build/${NODE_ENV}/*`]);
+  const NODE_ENV = process.env.NODE_ENV;
+  await del([`build/${NODE_ENV}/*`], { dot: true });
   await fs.makeDir(`build/${NODE_ENV}/public`);
 }
 
