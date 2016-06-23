@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 
-import io from '../socket'
+import io from '../../socket'
 
 import RoomListItem from './RoomListItem'
 

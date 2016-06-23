@@ -51,3 +51,39 @@ export function receiveLobbyUsers(users) {
     })
   }
 }
+
+export function receiveLobbyFriends(friends) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.lobby.RECEIVE_FRIENDS,
+      friends
+    })
+  }
+}
+
+export function receiveRoomUsers(roomId, spectators, players) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.room.RECEIVE_USERS,
+      roomId, spectators, players
+    })
+  }
+}
+
+export function receiveRoomUserJoined(roomId, user) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.room.USER_JOINED,
+      roomId, user
+    })
+  }
+}
+
+export function receiveRoomUserLeft(roomId, user) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.room.USER_LEFT,
+      roomId, user
+    })
+  }
+}

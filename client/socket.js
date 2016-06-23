@@ -17,7 +17,7 @@ class Socket {
 
     socket.on('lobby.users', users => {
       actions.receiveLobbyUsers(users)
-    });
+    })
 
     socket.on('lobby.rooms', rooms => {
       actions.receiveLobbyRooms(rooms)
@@ -25,7 +25,7 @@ class Socket {
 
     socket.on('room.joined', (roomId) => {
       actions.joinRoom(roomId)
-    });
+    })
 
     // socket.on('room.info', (table) => {
     //   let action = {
@@ -35,15 +35,17 @@ class Socket {
     //   dispatcher.handleServerAction(action);
     // });
 
-    // socket.on('room.users', (roomId, spectators, players) => {
-    //   let action = {
-    //     type: 'table.received_users',
-    //     roomId,
-    //     spectators,
-    //     players
-    //   };
-    //   dispatcher.handleServerAction(action);
-    // });
+    socket.on('room.users', (roomId, spectators, players) => {
+      actions.receiveRoomUsers(roomId, spectators, players)
+    })
+
+    socket.on('room.user_joined', (roomId, user) => {
+      actions.receiveRoomUserJoined(roomId, user)
+    })
+
+    socket.on('room.user_left', (roomId, user) => {
+      actions.receiveRoomUserLeft(roomId, user)
+    })
 
     socket.on('chat.message', (userId, message) => {
       let data = { userId, message }

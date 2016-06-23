@@ -2,27 +2,6 @@ import socketIO from 'socket.io'
 import User from './models/user'
 import Room from './models/room'
 
-// function sockets(server) {
-//   const io = socketIO(server)
-//
-//   io.on('connection', socket => {
-//     let user, session = socket.request.session
-//     const { realm } = session
-//
-//     User.findById('fb', session.fb.user.id)
-//       .then(user => {
-//         user.socketId = socket.id
-//         return user.save()
-//       })
-//       .then(_ => {
-//         socket.emit('joined')
-//       })
-//   })
-//
-//   return io
-// }
-
-
 function sockets(server) {
   const io = socketIO(server);
 

@@ -4,12 +4,12 @@ import {connect} from 'react-redux'
 
 import * as Actions from '../actions'
 
-import UserList from '../components/UserList'
-import RoomList from '../components/RoomList'
+import FriendList from '../components/lobby/FriendList'
+import RoomList from '../components/lobby/RoomList'
 
 @connect(state => {
   return {
-    users: state.lobby.get('users'),
+    friends: state.lobby.get('friends'),
     rooms: state.lobby.get('rooms')
   }
 })
@@ -22,6 +22,12 @@ export default class Lobby extends Component {
   constructor(props) {
     super(props)
     this.actions = bindActionCreators(Actions, this.props.dispatch)
+  }
+
+  componentDidMount() {
+    FB.api('/me/invitable_friends', (response) => {
+      this.actions.receiveLobbyFriends(response.data)
+    })
   }
 
   /**
@@ -43,11 +49,9 @@ export default class Lobby extends Component {
   render() {
     return (
       <div className='lobby'>
-        <aside>
-          <UserList users={this.props.users} />
-        </aside>
         <main>
           <RoomList rooms={this.props.rooms} />
+          <FriendList friends={this.props.friends} />
         </main>
       </div>
     )

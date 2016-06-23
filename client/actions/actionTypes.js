@@ -7,7 +7,13 @@ export default {
   lobby: {
     RECEIVE_ROOMS: 'lobby.receiveRooms',
     RECEIVE_USERS: 'lobby.receiveUsers',
-    JOIN_ROOM: 'lobby.joinRoom',
-    // CREATE_ROOM: 'lobby.createRoom'
+    RECEIVE_FRIENDS: 'lobby.receiveFriends',
+    JOIN_ROOM: 'lobby.joinRoom'
+  },
+
+  room: {
+    RECEIVE_USERS: 'room.receiveUsers',
+    USER_JOINED: 'room.userJoined',
+    USER_LEFT: 'room.userLeft'
   }
 }

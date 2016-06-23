@@ -4,8 +4,8 @@ import {connect} from 'react-redux'
 
 import * as Actions from '../actions'
 
-import UserList from '../components/UserList'
-import Chat from '../components/Chat'
+import UserList from '../components/room/UserList'
+import Chat from '../components/chat'
 import GameView from '../components/GameView'
 
 @connect( () => { return {} } )

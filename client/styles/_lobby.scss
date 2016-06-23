@@ -1,0 +1,37 @@
+.lobby {
+  display: flex;
+  height: 500px;
+
+  main {
+    display: flex;
+    flex: 1;
+  }
+
+  aside {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 250px;
+    height: 100%;
+  }
+
+  .userList {
+    background-color: yellow;
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .roomList {
+    background-color: blue;
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+
+    a, a:hover, a:focus, a:visited {
+      color: black;
+      font-weight: bold;
+    }
+  }
+}
