@@ -1,0 +1,148 @@
+
+// one of: 'svg', '16x16', '32x32', '72x72'
+$image-type: 'svg';
+// one of: 'svg', 'png'
+$image-ext: 'svg';
+
+$emoji-list: (
+  "1f604": "smile",
+  "1f606": "laughing",
+  "1f60a": "blush",
+  "1f603": "smiley",
+  "263a": "relaxed",
+  "1f60f": "smirk",
+  "1f60d": "heart_eyes",
+  "1f618": "kissing_heart",
+  "1f61a": "kissing_closed_eyes",
+  "1f633": "flushed",
+  "1f625": "relieved",
+  "1f60c": "satisfied",
+  "1f601": "grin",
+  "1f609": "wink",
+  "1f61c": "stuck_out_tongue_winking_eye",
+  "1f61d": "stuck_out_tongue_closed_eyes",
+  "1f600": "grinning",
+  "1f617": "kissing",
+  "1f619": "kissing_smiling_eyes",
+  "1f61b": "stuck_out_tongue",
+  "1f634": "sleeping",
+  "1f61f": "worried",
+  "1f626": "frowning",
+  "1f627": "anguished",
+  "1f62e": "open_mouth",
+  "1f62c": "grimacing",
+  "1f615": "confused",
+  "1f62f": "hushed",
+  "1f611": "expressionless",
+  "1f612": "unamused",
+  "1f605": "sweat_smile",
+  "1f613": "sweat",
+  "1f629": "weary",
+  "1f614": "pensive",
+  "1f61e": "disappointed",
+  "1f616": "confounded",
+  "1f628": "fearful",
+  "1f630": "cold_sweat",
+  "1f623": "persevere",
+  "1f622": "cry",
+  "1f62d": "sob",
+  "1f602": "joy",
+  "1f632": "astonished",
+  "1f631": "scream",
+  "1f62b": "tired_face",
+  "1f620": "angry",
+  "1f621": "rage",
+  "1f624": "triumph",
+  "1f62a": "sleepy",
+  "1f60b": "yum",
+  "1f637": "mask",
+  "1f60e": "sunglasses",
+  "1f635": "dizzy_face",
+  "1f47f": "imp",
+  "1f608": "smiling_imp",
+  "1f610": "neutral_face",
+  "1f636": "no_mouth",
+  "1f607": "innocent",
+  "1f47d": "alien",
+  "1f49b": "yellow_heart",
+  "1f499": "blue_heart",
+  "1f49c": "purple_heart",
+  "2764": "heart",
+  "1f49a": "green_heart",
+  "1f494": "broken_heart",
+  "1f493": "heartbeat",
+  "1f497": "heartpulse",
+  "1f495": "two_hearts",
+  "1f49e": "revolving_hearts",
+  "1f498": "cupid",
+  "1f496": "sparkling_heart",
+  "2728": "sparkles",
+  "2b50": "star",
+  "1f31f": "star2",
+  "1f4ab": "dizzy",
+  "1f4a5": "boom",
+  "1f4a2": "anger",
+  "2757": "exclamation",
+  "2753": "question",
+  "2755": "grey_exclamation",
+  "2754": "grey_question",
+  "1f4a4": "zzz",
+  "1f4a8": "dash",
+  "1f4a6": "sweat_drops",
+  "1f3b6": "notes",
+  "1f3b5": "musical_note",
+  "1f525": "fire",
+  "1f4a9": "poop",
+  "1f44d": "thumbsup",
+  "1f44e": "thumbsdown",
+  "1f44c": "ok_hand",
+  "1f44a": "punch",
+  "270a": "fist",
+  "270c": "v",
+  "1f44b": "wave",
+  "270b": "hand",
+  "1f450": "open_hands",
+  "261d": "point_up",
+  "1f447": "point_down",
+  "1f448": "point_left",
+  "1f449": "point_right",
+  "1f64c": "raised_hands",
+  "1f64f": "pray",
+  "1f446": "point_up_2",
+  "1f44f": "clap",
+  "1f4aa": "muscle",
+  "1f6b6": "walking",
+  "1f3c3": "runner",
+  "1f46b": "couple",
+  "1f46a": "family",
+  "1f63a": "smiley_cat",
+  "1f638": "smile_cat",
+  "1f63b": "heart_eyes_cat",
+  "1f63d": "kissing_cat",
+  "1f63c": "smirk_cat",
+  "1f640": "scream_cat",
+  "1f63f": "crying_cat_face",
+  "1f639": "joy_cat",
+  "1f63e": "pouting_cat"
+);
+
+:global {
+  .emoji {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center center;
+
+    width: 1.25em;
+    height: 1.25em;
+    margin: -0.25ex 0.0625em 0 0.125em;
+    background-size: 1.25em 1.25em;
+  }
+
+  @each $code, $shortname in $emoji-list {
+    .emoji-#{$shortname} {
+      background-image: url("https://twemoji.maxcdn.com/#{$image-type}/#{$code}.#{$image-ext}");
+    }
+  }
+}

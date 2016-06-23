@@ -1,6 +1,7 @@
 import express from 'express';
 import config from './config';
 import FB from 'fb';
+import User from './models/user';
 
 FB.options({
   appId: config.fb.appId,
@@ -20,22 +21,28 @@ router.post('/fb', (req, res) => {
   }
 
   const fields = ['id', 'name', 'first_name', 'last_name'];
-  FB.withAccessToken(accessToken).napi('me', { fields: fields }, (error, response) => {
+  FB.withAccessToken(accessToken).napi('me', { fields: fields }, async (error, response) => {
     if (error) {
       res.status(500).send(JSON.stringify({ error: `FB API Error: ${error.message}` }));
     } else {
-      let profile = {
-        id: response.id,
-        name: response.name,
-        firstName: response.first_name,
-        lastName: response.last_name
-      };
-      req.session.realm = 'fb';
-      req.session.fb = profile;
+      try {
+        let user = await User.findById('fb', response.id);
+        if (!user) {
+          user = new User({ realm: 'fb', id: response.id });
+        }
+        user.name = response.name;
+        user.firstName = response.first_name;
+        user.lastName = response.last_name;
+        await user.save();
 
-      // TODO: Try to retrieve the user and save to databse.
+        req.session.realm = 'fb';
+        req.session.fb = { accessToken, user };
 
-      res.send(JSON.stringify(profile));
+        res.send(JSON.stringify(user));
+      }
+      catch(error) {
+        console.log('Error:', error);
+      }
     }
   });
 

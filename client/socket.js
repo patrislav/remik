@@ -1,17 +1,60 @@
 
-import io from 'socket.io-client';
+import io from 'socket.io-client'
+import {bindActionCreators} from 'redux'
 
-let socket;
+import * as Actions from './actions'
+
+let socket, actions
 
 class Socket {
-  connect() {
-    socket = io();
+  connect(dispatcher) {
+    actions = bindActionCreators(Actions, dispatcher)
+    socket = io()
+
+    socket.on('exception', (...data) => {
+      console.log('Error: ', ...data);
+    })
+
+    socket.on('lobby.users', users => {
+      actions.receiveLobbyUsers(users)
+    });
+
+    socket.on('lobby.rooms', rooms => {
+      actions.receiveLobbyRooms(rooms)
+    })
+
+    socket.on('room.joined', (roomId) => {
+      actions.joinRoom(roomId)
+    });
+
+    // socket.on('room.info', (table) => {
+    //   let action = {
+    //     type: 'table.info',
+    //     table
+    //   };
+    //   dispatcher.handleServerAction(action);
+    // });
+
+    // socket.on('room.users', (roomId, spectators, players) => {
+    //   let action = {
+    //     type: 'table.received_users',
+    //     roomId,
+    //     spectators,
+    //     players
+    //   };
+    //   dispatcher.handleServerAction(action);
+    // });
+
+    socket.on('chat.message', (userId, message) => {
+      let data = { userId, message }
+      actions.receiveChatMessage(data)
+    })
   }
 
   get socket() {
-    return socket;
+    return socket
   }
 }
 
-const instance = new Socket();
-export default instance;
+const instance = new Socket()
+export default instance

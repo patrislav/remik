@@ -1,11 +1,11 @@
-import path from 'path';
-import webpack from 'webpack';
-import extend from 'extend';
-import fs from 'fs';
+import path from 'path'
+import webpack from 'webpack'
+import extend from 'extend'
+import fs from 'fs'
 
-const NODE_ENV = process.env.NODE_ENV;
-const VERBOSE = process.argv.includes('--verbose');
-const DEBUG = (NODE_ENV === 'development');
+const NODE_ENV = process.env.NODE_ENV || 'development'
+const VERBOSE = process.argv.includes('--verbose')
+const DEBUG = (NODE_ENV === 'development')
 const GLOBALS = {
   __DEV__: DEBUG
 }
@@ -20,14 +20,14 @@ const AUTOPREFIXER_BROWSERS = [
   'Safari >= 7.1',
 ];
 
-let nodeModules = {};
+let nodeModules = {}
 fs.readdirSync('node_modules')
   .filter(function(x) {
-    return ['.bin'].indexOf(x) === -1;
+    return ['.bin'].indexOf(x) === -1
   })
   .forEach(function(mod) {
-    nodeModules[mod] = 'commonjs ' + mod;
-  });
+    nodeModules[mod] = 'commonjs ' + mod
+  })
 
 //
 // Common configuration chunk to be used for both
@@ -53,17 +53,20 @@ const baseConfig = {
           presets: [
             'react',
             'es2015',
-            'stage-3',
+            'stage-0',
           ],
           plugins: [
+            'syntax-async-functions',
             'transform-runtime',
+            'transform-regenerator',
+            'transform-decorators-legacy'
           ],
         },
       },
       {
         test: /\.scss$/,
         loaders: [
-          'isomorphic-style-loader',
+          'style',
           `css-loader?${JSON.stringify({
             sourceMap: DEBUG,
             // CSS Modules https://github.com/css-modules/css-modules
@@ -71,6 +74,9 @@ const baseConfig = {
             localIdentName: DEBUG ? '[name]_[local]_[hash:base64:3]' : '[hash:base64:4]',
             // CSS Nano http://cssnano.co/options/
             minimize: !DEBUG,
+          })}`,
+          `sass-loader?${JSON.stringify({
+            sourceMap: DEBUG
           })}`,
           'postcss-loader?parser=postcss-scss',
         ],
