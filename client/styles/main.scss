@@ -59,4 +59,36 @@ a {
 
   @import 'chat';
 
+  .gameView {
+    background-image: url("http://api.thumbr.it/whitenoise-256x256.png?background=1d9925ff&noise=376937&density=42&opacity=24");
+    background-repeat: repeat;
+    flex: 1;
+
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gameAreaView {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 1em;
+    padding: 1em;
+    border: 3px solid black;
+    border-radius: 5px;
+
+    // Unfortunately the height needs to be specified manually for the layout
+    // to work as expected.
+    height: 340px;
+  }
+
+  .handView {
+    height: 90px;
+    width: 550px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 0;
+  }
+
 }

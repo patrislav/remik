@@ -14,6 +14,7 @@ export default {
   room: {
     RECEIVE_USERS: 'room.receiveUsers',
     USER_JOINED: 'room.userJoined',
-    USER_LEFT: 'room.userLeft'
+    USER_LEFT: 'room.userLeft',
+    ROOM_SETTINGS: 'room.settings'
   }
 }

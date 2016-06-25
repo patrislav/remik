@@ -1,5 +1,6 @@
 
 import actionTypes from './actionTypes'
+import {getUser} from '../helpers'
 
 export function goToLobby() {
   return dispatch => {
@@ -13,7 +14,7 @@ export function goToLobby() {
 export function receiveChatMessage(data) {
   return (dispatch, getState) => {
     let { userId, message } = data
-    let user = getState().lobby.get('users').find(u => u.id === userId)
+    let user = getUser(getState(), userId)
     dispatch({
       type: actionTypes.RECEIVE_MESSAGE,
       data: { user, message }
@@ -57,6 +58,15 @@ export function receiveLobbyFriends(friends) {
     dispatch({
       type: actionTypes.lobby.RECEIVE_FRIENDS,
       friends
+    })
+  }
+}
+
+export function receiveRoomSettings(roomId, settings) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.room.ROOM_SETTINGS,
+      roomId, settings
     })
   }
 }

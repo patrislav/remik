@@ -1,33 +1,41 @@
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
 
-@connect(state => {
-  return {
-    players: state.room.get('players'),
-    spectators: state.room.get('spectators')
-  }
-})
+import PlayProfile from '../PlayProfile'
+import JoinButton from '../JoinButton'
+
 export default class UserList extends Component {
+
+  static propTypes = {
+    onSit: PropTypes.func,
+    players: PropTypes.object
+  }
+
+  static defaultProps = {
+    onSit: () => {},
+    players: {}
+  }
+
   render() {
     return (
       <section className="userList">
-        <h3>Players</h3>
-        <ul className="playerList">
-          {this.userElements(this.props.players)}
-        </ul>
-        <h3>Spectators</h3>
-        <ul className="spectatorList">
-          {this.userElements(this.props.spectators)}
-        </ul>
+        {this.profileElements(this.props.players)}
       </section>
     )
   }
 
-  userElements(users) {
-    return users.map(user =>
-      <li key={user.id}>
-        <span>{user.name}</span>
-      </li>
-    )
+  profileElements = (users) => {
+    let elements = []
+    for (let i in users) {
+      let element
+      if (users[i]) {
+        element = <PlayProfile user={users[i]} />
+      }
+      else {
+        element = <JoinButton onClick={this.props.onSit(i)} />
+      }
+      elements.push(<li key={i}>{element}</li>)
+    }
+
+    return elements
   }
 }

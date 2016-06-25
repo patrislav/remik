@@ -35,6 +35,10 @@ class Socket {
     //   dispatcher.handleServerAction(action);
     // });
 
+    socket.on('room.settings', (roomId, settings) => {
+      actions.receiveRoomSettings(roomId, settings)
+    })
+
     socket.on('room.users', (roomId, spectators, players) => {
       actions.receiveRoomUsers(roomId, spectators, players)
     })

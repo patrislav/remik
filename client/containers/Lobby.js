@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
+import io from '../socket'
 import * as Actions from '../actions'
 
 import FriendList from '../components/lobby/FriendList'
@@ -50,10 +51,26 @@ export default class Lobby extends Component {
     return (
       <div className='lobby'>
         <main>
-          <RoomList rooms={this.props.rooms} />
+          <RoomList
+            rooms={this.props.rooms}
+            onJoin={this._onJoinRoom}
+            onCreate={this._onCreateRoom}
+            />
           <FriendList friends={this.props.friends} />
         </main>
       </div>
     )
+  }
+
+  _onCreateRoom = (event) => {
+    io.socket.emit('room.create')
+    event.preventDefault()
+  }
+
+  _onJoinRoom = (room) => {
+    return event => {
+      io.socket.emit('room.join', room.id)
+      event.preventDefault()
+    }
   }
 }

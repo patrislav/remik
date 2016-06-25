@@ -2,13 +2,18 @@ import React, {Component, PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
+import io from '../socket'
 import * as Actions from '../actions'
 
 import UserList from '../components/room/UserList'
 import Chat from '../components/chat'
 import GameView from '../components/GameView'
 
-@connect( () => { return {} } )
+@connect(state => {
+  return {
+    players: state.room.get('players')
+  }
+})
 export default class Play extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
@@ -40,7 +45,10 @@ export default class Play extends Component {
     return (
       <div className='play'>
         <aside>
-          <UserList />
+          <UserList
+            players={this.props.players}
+            onSit={this._onSit}
+            />
           <Chat />
         </aside>
         <main>
@@ -48,5 +56,12 @@ export default class Play extends Component {
         </main>
       </div>
     )
+  }
+
+  _onSit = (seat) => {
+    return event => {
+      io.socket.emit('game.join', seat)
+      event.preventDefault()
+    }
   }
 }
