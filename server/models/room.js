@@ -1,8 +1,8 @@
 
-import { model, index } from 'mongoose-decorators';
-import User from './user';
+import { model, index } from 'mongoose-decorators'
+import User from './user'
 
-const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan'];
+const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
 @model({
   realm: { type: String },
@@ -28,59 +28,60 @@ const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan'];
 class Room {
 
   get id() {
-    return this._id;
+    return this._id
   }
 
   toJSON() {
-    let { id } = this;
-    return { id };
+    let { id } = this
+    return { id }
   }
 
   addUser(userId) {
     if (!this.users.includes(userId)) {
-      this.users.push(userId);
+      this.users.push(userId)
     }
   }
 
   removeUser(userId) {
-    let index = this.users.indexOf(userId);
+    let index = this.users.indexOf(userId)
     if (index > -1) {
-      this.users.splice(index, 1);
+      this.users.splice(index, 1)
     }
 
-    this.removePlayer(userId);
+    this.removePlayer(userId)
+
+    if (this.users.length <= 0) {
+      this.remove()
+      return false
+    }
+
+    return true
   }
 
-  addPlayer(userId) {
-    for (let key in this.players) {
-      if (this.players.hasOwnProperty(key) && this.players[key] === userId) {
-        return false;
-      }
+  addPlayer(seat, userId) {
+    if (this.players.hasOwnProperty(seat) && !this.players[seat]) {
+      this.addUser(userId)
+      this.players[seat] = userId
+      this.markModified('players') // otherwise it isn't persisted
+      return true
     }
 
-    this.addUser(userId);
-
-    for (let key of PLAYER_COLOURS) {
-      if (!this.players.hasOwnProperty(key)) {
-        this.players[key] = userId;
-        return true;
-      }
-    }
-
-    // If we reached this point, all player seats are already taken
     return false;
   }
 
   removePlayer(userId) {
     for (let key in this.players) {
       if (this.players.hasOwnProperty(key) && this.players[key] === userId) {
-        delete this.players[key];
+        this.players[key] = null
+        this.markModified('players') // otherwise it isn't persisted
+        return true
       }
     }
+    return false
   }
 
   static findById(realm, _id) {
-    return this.findOne({ _id, realm }).exec();
+    return this.findOne({ _id, realm }).exec()
   }
 
 }

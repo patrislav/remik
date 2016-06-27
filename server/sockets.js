@@ -1,6 +1,7 @@
 import socketIO from 'socket.io'
 import User from './models/user'
 import Room from './models/room'
+import emitters from './emitters'
 
 function sockets(server) {
   const io = socketIO(server)
@@ -9,6 +10,7 @@ function sockets(server) {
   io.on('connection', async (socket) => {
     let user, session = socket.request.session
     const { realm } = session
+    const emit = emitters(io, realm)
 
     try {
       if (realm === 'fb') {
@@ -39,7 +41,7 @@ function sockets(server) {
 
     socket.broadcast.emit('lobby.user_joined', user)
     // emitLobbyUsers(socket)
-    emitRooms(socket)
+    emit.rooms(socket)
 
     socket.on('disconnect', async () => {
       socket.broadcast.emit('lobby.user_left', user)
@@ -50,9 +52,10 @@ function sockets(server) {
 
         let room = await Room.findOne({ realm, users: user.id }).exec()
         if (room) {
-          room.removeUser(user.id)
-          await room.save()
           socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
+          if (room.removeUser(user.id)) {
+            room.save()
+          }
         }
       }
       catch(e) {
@@ -68,19 +71,21 @@ function sockets(server) {
           return
         }
 
-        let room = await Room.findById(realm, roomId)
+        Room.findOne({ realm, _id: roomId })
+          .then((room) => {
+            room.addUser(user.id)
+            return room.save()
+          })
+          .then((room) => {
+            socket.join(room.id)
+            socket.emit('room.joined', room.id)
+            socket.broadcast.to(room.id).emit('room.user_joined', room.id, user)
 
-        console.log("Before ", room.users)
-        room.addUser(user.id)
-        console.log("After ", room.users)
-        await room.save()
+            emit.roomUsers(socket, room)
+            emit.roomSettings(socket, room)
 
-        socket.join(room.id)
-        socket.emit('room.joined', room.id)
-        socket.broadcast.to(room.id).emit('room.user_joined', room.id, user)
-
-        emitRoomUsers(socket, room)
-        emitRoomSettings(socket, room)
+            console.log("After ", room)
+          })
       }
       catch(e) {
         console.log('room.join', e)
@@ -100,8 +105,8 @@ function sockets(server) {
       socket.leave(room.id)
       socket.emit('room.left', room.id)
       socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
-      emitRooms(socket)
-      emitLobbyUsers(socket)
+      emit.rooms(socket)
+      emit.lobbyUsers(socket)
     })
 
     socket.on('room.create', async () => {
@@ -112,7 +117,8 @@ function sockets(server) {
       }
 
       try {
-        let room = new Room({ realm })
+        let players = { red: null, blue: null }
+        let room = new Room({ realm, players })
         room.addUser(user.id)
         await room.save()
 
@@ -120,8 +126,8 @@ function sockets(server) {
         socket.emit('room.joined', room.id)
         io.to(room.id).emit('room.created', room.id)
 
-        emitRoomUsers(socket, room)
-        emitRoomSettings(socket, room)
+        emit.roomUsers(socket, room)
+        emit.roomSettings(socket, room)
       }
       catch (error) {
         socket.emit('exception', 'room.create', error)
@@ -158,49 +164,26 @@ function sockets(server) {
       }
     })
 
-    async function emitLobbyUsers(target) {
+    socket.on('game.join', async (seat) => {
       try {
-        let socketIds = Object.keys(io.sockets.connected)
-        let users = await User.find({ realm, socketId: { $in: socketIds } }).exec()
-        (target || io).emit('lobby.users', users)
-      }
-      catch(error) {
-        console.log('emitLobbyUsers', error)
-      }
-    }
-
-    async function emitRoomUsers(target = io, room) {
-      try {
-        User.find({ realm, id: { $in: room.users }})
-          .then(users => {
-            let players = {
-              red: null, blue: null, green: null, yellow: null
+        Room.findOne({ realm, users: user.id })
+          .then((room) => {
+            if (room.addPlayer(seat, user.id)) {
+              return room.save()
             }
-
-            target.emit('room.users', room.id, users, players)
+            else {
+              throw new Error(`Cannot sit on seat '${seat}' in room ${room.id}`)
+            }
+          })
+          .then((room) => {
+            io.to(room.id).emit('game.user_joined', room.id, user, seat)
           })
       }
       catch(e) {
-        console.log('emitRoomUsers', e)
+        console.log('game.join', e)
       }
-    }
+    })
 
-    async function emitRoomSettings(target, room) {
-      (target || io).emit('room.settings', room.id, room.settings)
-    }
-
-    async function emitRooms(target) {
-      try {
-        Room.find({ realm })
-          .then(rooms => rooms.map(room => room.toJSON()))
-          .then(rooms => {
-            (target || io).emit('lobby.rooms', rooms)
-          })
-      }
-      catch(e) {
-        console.log('emitRooms', e)
-      }
-    }
   })
 
   return io

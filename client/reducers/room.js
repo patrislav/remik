@@ -39,15 +39,15 @@ export default (state = initialState, action) => {
     case actionTypes.room.USER_LEFT:
       if (state.get('id') !== action.roomId)
         return state
-      state = state.update('players', players => {
-        for (let v in players) {
-          if (players[v].id === action.user.id) {
-            players[v] = null
-            break
-          }
-        }
-        return players
-      })
+      // state = state.update('players', players => {
+      //   for (let v in players) {
+      //     if (players[v].id === action.user.id) {
+      //       players[v] = null
+      //       break
+      //     }
+      //   }
+      //   return players
+      // })
       return state.set('spectators', state.get('spectators').filter((user) => user.id !== action.user.id))
 
     default:
