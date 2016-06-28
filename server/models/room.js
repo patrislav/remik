@@ -36,12 +36,23 @@ class Room {
     return { id }
   }
 
+  /**
+   * Adds a user with the given ID
+   *
+   * @param {string} userId
+   */
   addUser(userId) {
     if (!this.users.includes(userId)) {
       this.users.push(userId)
     }
   }
 
+  /**
+   * Removes a user with the given ID
+   *
+   * @param {string} userId
+   * @return {boolean} result
+   */
   removeUser(userId) {
     let index = this.users.indexOf(userId)
     if (index > -1) {
@@ -58,7 +69,21 @@ class Room {
     return true
   }
 
+  /**
+   * Adds a user as a player on a given seat
+   *
+   * @param {string} seat - One of PLAYER_COLOURS
+   * @param {string} userId - ID of the user
+   * @return {boolean} result
+   */
   addPlayer(seat, userId) {
+    // Return false if the user is already a player in this room
+    for (let i in this.players) {
+      if (this.players[i] === userId) {
+        return false
+      }
+    }
+
     if (this.players.hasOwnProperty(seat) && !this.players[seat]) {
       this.addUser(userId)
       this.players[seat] = userId
@@ -66,9 +91,15 @@ class Room {
       return true
     }
 
-    return false;
+    return false
   }
 
+  /**
+   * Removes a player with given ID
+   *
+   * @param {string} userId - ID of the user to remove from player list
+   * @return {boolean} result
+   */
   removePlayer(userId) {
     for (let key in this.players) {
       if (this.players.hasOwnProperty(key) && this.players[key] === userId) {
@@ -86,4 +117,4 @@ class Room {
 
 }
 
-export default Room;
+export default Room

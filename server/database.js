@@ -1,33 +1,33 @@
 
-import config from './config';
+import config from './config'
 
 function database(app, mongoose) {
-  mongoose.Promise = Promise;
+  mongoose.Promise = Promise
 
   const options = {
     server: {
       socketOptions: { keepAlive: true }
     },
     auto_reconnect: true
-  };
+  }
 
   const connect = function() {
-    mongoose.connect(config.mongo.uri, options);
-  };
+    mongoose.connect(config.mongo.uri, options)
+  }
 
-  connect();
+  connect()
 
   // Error handler
   mongoose.connection.on('error', (error) => {
-    console.error('Connection error: ' + error);
-  });
+    console.error('Connection error: ' + error)
+  })
 
   // Reconnect when disconnected
   mongoose.connection.on('disconnected', () => {
-    connect();
-  });
+    connect()
+  })
 
-  return mongoose.connection;
+  return mongoose.connection
 }
 
-export default database;
+export default database

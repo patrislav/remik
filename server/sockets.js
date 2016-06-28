@@ -41,6 +41,7 @@ function sockets(server) {
 
     socket.broadcast.emit('lobby.user_joined', user)
     // emitLobbyUsers(socket)
+    socket.emit('me', user)
     emit.rooms(socket)
 
     socket.on('disconnect', async () => {
@@ -83,8 +84,6 @@ function sockets(server) {
 
             emit.roomUsers(socket, room)
             emit.roomSettings(socket, room)
-
-            console.log("After ", room)
           })
       }
       catch(e) {
@@ -176,11 +175,31 @@ function sockets(server) {
             }
           })
           .then((room) => {
-            io.to(room.id).emit('game.user_joined', room.id, user, seat)
+            io.to(room.id).emit('game.user_joined', room.id, user.id, seat)
           })
       }
       catch(e) {
         console.log('game.join', e)
+      }
+    })
+
+    socket.on('game.leave', async () => {
+      try {
+        Room.findOne({ realm, users: user.id })
+          .then((room) => {
+            if (room.removePlayer(user.id)) {
+              return room.save()
+            }
+            else {
+              throw new Error(`Cannot remove player ${user.id} from room ${room.id}`)
+            }
+          })
+          .then((room) => {
+            io.to(room.id).emit('game.user_left', room.id, user.id)
+          })
+      }
+      catch(e) {
+        console.log('game.leave', e)
       }
     })
 

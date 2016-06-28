@@ -1,5 +1,5 @@
 
-import { model, index } from 'mongoose-decorators';
+import { model, index } from 'mongoose-decorators'
 
 @model({
   realm: { type: String },
@@ -14,9 +14,9 @@ import { model, index } from 'mongoose-decorators';
 class User {
 
   static findById(realm, id) {
-    return this.findOne({ realm, id }).exec();
+    return this.findOne({ realm, id }).exec()
   }
 
 }
 
-export default User;
+export default User
