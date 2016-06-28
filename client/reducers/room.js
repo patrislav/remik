@@ -4,7 +4,7 @@ import actionTypes from '../actions/actionTypes'
 
 const initialState = Map({
   id: null,
-  players: {},
+  players: Map(),
   spectators: [],
 
   settings: Map({
@@ -20,8 +20,11 @@ const initialState = Map({
  */
 export default (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.lobby.JOIN_ROOM:
+    case actionTypes.room.JOIN:
       return state.set('id', action.roomId)
+
+    case actionTypes.room.LEAVE:
+      return initialState
 
     case actionTypes.room.ROOM_SETTINGS:
       return state.set('settings', state.get('settings').merge(action.settings))
@@ -29,7 +32,9 @@ export default (state = initialState, action) => {
     case actionTypes.room.RECEIVE_USERS:
       if (state.get('id') !== action.roomId)
         return state
-      return state.set('players', action.players).set('spectators', action.spectators)
+      let players = fromJS(action.players)
+      console.log(players.toJS())
+      return state.set('players', state.get('players').merge(action.players)).set('spectators', action.spectators)
 
     case actionTypes.room.USER_JOINED:
       if (state.get('id') !== action.roomId)
@@ -50,7 +55,28 @@ export default (state = initialState, action) => {
       // })
       return state.set('spectators', state.get('spectators').filter((user) => user.id !== action.user.id))
 
+    case actionTypes.game.USER_JOINED:
+      return state.setIn(['players', action.seat], action.user)
+
+    case actionTypes.game.USER_LEFT:
+      let seat = findSeatByUserId(state, action.userId)
+      if (seat) {
+        state = state.setIn(['players', seat], null)
+      }
+      return state
+
     default:
       return state
   }
+}
+
+function findSeatByUserId(state, userId) {
+  let players = state.get('players').toJS()
+  for (let seat in players) {
+    if (players[seat] && players[seat].id === userId) {
+      return seat
+    }
+  }
+
+  return null
 }

@@ -5,6 +5,7 @@ import {phases} from '../constants'
 
 const initialState = Map({
   screen: 'preload',
+  user: null,
 
   // GAME DATA
   status: Map({
@@ -25,6 +26,15 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SWITCH_SCREEN:
       return state.set('screen', action.screen)
+
+    case actionTypes.RECEIVE_ME:
+      return state.set('user', action.user)
+
+    case actionTypes.game.STARTED:
+      return state.update('status', s => s.merge(action.status))
+
+    case actionTypes.game.STOPPED:
+      return state.update('status', s => s.merge(action.status))
 
     default:
       return state

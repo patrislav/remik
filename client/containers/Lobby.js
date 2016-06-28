@@ -50,13 +50,15 @@ export default class Lobby extends Component {
   render() {
     return (
       <div className='lobby'>
+        <aside>
+          <FriendList users={this.props.friends} />
+        </aside>
         <main>
           <RoomList
             rooms={this.props.rooms}
             onJoin={this._onJoinRoom}
             onCreate={this._onCreateRoom}
             />
-          <FriendList friends={this.props.friends} />
         </main>
       </div>
     )

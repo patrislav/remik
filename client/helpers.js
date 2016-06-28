@@ -4,5 +4,5 @@ export function getUser(state, userId) {
 }
 
 export function getProfilePictureUrl(user) {
-  return `http://graph.facebook.com/#{user.id}/picture`
+  return `http://graph.facebook.com/${user.id}/picture`
 }

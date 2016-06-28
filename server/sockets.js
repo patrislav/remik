@@ -91,21 +91,37 @@ function sockets(server) {
       }
     })
 
+    /**
+     * FIXME: When the user who is a player, leaves, emit game.user_left (correctly...)
+     * TODO: Stop the game if the user was a player and the game was running
+     * TODO: If the room is deleted, notify the lobby about it
+     */
     socket.on('room.leave', async (roomId) => {
-      let room = await Room.findOne({ realm, users: user.id }).exec()
-      if (!room.users.includes(user.id)) {
-        socket.emit('exception', 'room.leave', 'not in room')
-        return
-      }
+      Room.findOne({ realm, users: user.id })
+        .then((room) => {
+          if (!room.users.includes(user.id)) {
+            throw new Error('room.leave: not in room')
+          }
 
-      room.removeUser(user.id)
-      await room.save()
-
-      socket.leave(room.id)
-      socket.emit('room.left', room.id)
-      socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
-      emit.rooms(socket)
-      emit.lobbyUsers(socket)
+          if (room.removeUser(user.id)) {
+            return room.save()
+          }
+          else {
+            return room
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .then((room) => {
+          socket.emit('room.left', room.id)
+          socket.leave(room.id)
+          socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
+          emit.rooms(socket)
+          emit.lobbyUsers(socket)
+        }, (err) => {
+          console.log(err)
+        })
     })
 
     socket.on('room.create', async () => {
@@ -125,6 +141,7 @@ function sockets(server) {
         socket.emit('room.joined', room.id)
         io.to(room.id).emit('room.created', room.id)
 
+        emit.rooms()
         emit.roomUsers(socket, room)
         emit.roomSettings(socket, room)
       }
@@ -168,6 +185,7 @@ function sockets(server) {
         Room.findOne({ realm, users: user.id })
           .then((room) => {
             if (room.addPlayer(seat, user.id)) {
+              room.startGame() // starts the game if possible
               return room.save()
             }
             else {
@@ -176,6 +194,10 @@ function sockets(server) {
           })
           .then((room) => {
             io.to(room.id).emit('game.user_joined', room.id, user.id, seat)
+
+            if (room.status.gameStarted) {
+              io.to(room.id).emit('game.started', room.id, room.status)
+            }
           })
       }
       catch(e) {
@@ -185,9 +207,11 @@ function sockets(server) {
 
     socket.on('game.leave', async () => {
       try {
+        let stoppedGame = false
         Room.findOne({ realm, users: user.id })
           .then((room) => {
             if (room.removePlayer(user.id)) {
+              stoppedGame = room.stopGame()
               return room.save()
             }
             else {
@@ -196,6 +220,9 @@ function sockets(server) {
           })
           .then((room) => {
             io.to(room.id).emit('game.user_left', room.id, user.id)
+            if (stoppedGame) {
+              io.to(room.id).emit('game.stopped', room.id, room.status)
+            }
           })
       }
       catch(e) {

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 
-export default class JoinButton extends Component {
+export default class StandUpButton extends Component {
   /**
    * Expected properties object types.
    */
@@ -14,8 +14,8 @@ export default class JoinButton extends Component {
 
   render() {
     return (
-      <button className="joinButton" onClick={this._onClick}>
-        Sit here
+      <button className="standupButton" onClick={this._onClick}>
+        Stand up
       </button>
     )
   }

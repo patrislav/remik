@@ -19,7 +19,7 @@ export default class PlayProfile extends Component {
 
   render() {
     return (
-      <div className="playProfile"><img src={getProfilePictureUrl(user)} /></div>
+      <div className="playProfile"><img src={getProfilePictureUrl(this.props.user)} /></div>
     )
   }
 

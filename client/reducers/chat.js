@@ -22,8 +22,19 @@ export default (state = initialState, action) => {
 
     case actionTypes.room.USER_LEFT:
       return addMessage(state, {
-         user: action.user, 
+         user: action.user,
          code: 'user_left'
+      })
+
+    case actionTypes.game.USER_JOINED:
+      return addMessage(state, {
+        user: action.user,
+        code: 'user_joined_playing'
+      })
+
+    case actionTypes.game.STARTED:
+      return addMessage(state, {
+        message: 'The game may now start!'
       })
 
     default:

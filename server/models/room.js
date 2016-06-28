@@ -1,6 +1,8 @@
 
 import { model, index } from 'mongoose-decorators'
 import User from './user'
+// TODO: Move this file into common directory
+import {phases} from '../../client/constants'
 
 const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
@@ -15,7 +17,8 @@ const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
     turnTime: { type: Number, default: 0 }
   },
   status: {
-    currentPlayer: { type: Number, default: null },
+    currentPlayer: { type: String, default: null },
+    phase: { type: String, default: phases.WAITING_FOR_PLAYERS },
     turnStartedAt: { type: Date, default: null },
     gameStarted: { type: Boolean, default: false }
   },
@@ -111,10 +114,66 @@ class Room {
     return false
   }
 
+  /**
+   * Starts the game if possible
+   */
+  startGame() {
+    if (!this.isReady()) {
+      return false
+    }
+
+    this.status.gameStarted = true
+    this.status.phase = phases.CARD_TAKING
+    this.status.currentPlayer = randomSeat(this.players)
+    this.status.turnStartedAt = Date.now()
+
+    return true
+  }
+
+  /**
+   * Stops the game if it's been started
+   */
+  stopGame() {
+    if (this.status.gameStarted) {
+      this.status.gameStarted = false
+      this.status.phase = phases.WAITING_FOR_PLAYERS
+      this.status.currentPlayer = null
+      this.status.turnStartedAt = null
+
+      return true
+    }
+
+    return false
+  }
+
+  isReady() {
+    let numPlayers = 0
+    for (let i in this.players) {
+      if (this.players[i]) {
+        numPlayers += 1
+      }
+    }
+
+    if (numPlayers === this.settings.maxPlayers) {
+      return true
+    }
+
+    return false
+  }
+
+  // isPlayer(userId) {
+  //   return Object.values(this.players).includes(userId)
+  // }
+
   static findById(realm, _id) {
     return this.findOne({ _id, realm }).exec()
   }
 
+}
+
+function randomSeat(players) {
+  let seats = Object.keys(players)
+  return seats[Math.floor(Math.random() * seats.length)]
 }
 
 export default Room

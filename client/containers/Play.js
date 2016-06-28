@@ -11,7 +11,8 @@ import GameView from '../components/GameView'
 
 @connect(state => {
   return {
-    players: state.room.get('players')
+    user: state.game.get('user'),
+    players: state.room.get('players').toJS()
   }
 })
 export default class Play extends Component {
@@ -47,7 +48,10 @@ export default class Play extends Component {
         <aside>
           <UserList
             players={this.props.players}
-            onSit={this._onSit}
+            onSitDown={this._onSitDown}
+            onStandUp={this._onStandUp}
+            onLeave={this._onLeave}
+            currentlySitting={this.isSitting()}
             />
           <Chat />
         </aside>
@@ -58,10 +62,30 @@ export default class Play extends Component {
     )
   }
 
-  _onSit = (seat) => {
+  isSitting = () => {
+    console.log(this.props.players)
+    for (let i of Object.keys(this.props.players)) {
+      if (this.props.players[i] && this.props.players[i].id === this.props.user.id) {
+        return true
+      }
+    }
+    return false
+  }
+
+  _onSitDown = (seat) => {
     return event => {
       io.socket.emit('game.join', seat)
       event.preventDefault()
     }
+  }
+
+  _onStandUp = (event) => {
+    io.socket.emit('game.leave')
+    event.preventDefault()
+  }
+
+  _onLeave = (event) => {
+    io.socket.emit('room.leave')
+    event.preventDefault()
   }
 }

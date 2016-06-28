@@ -15,6 +15,10 @@ class Socket {
       console.log('Error: ', ...data);
     })
 
+    socket.on('me', user => {
+      actions.receiveMe(user)
+    })
+
     socket.on('lobby.users', users => {
       actions.receiveLobbyUsers(users)
     })
@@ -25,6 +29,10 @@ class Socket {
 
     socket.on('room.joined', (roomId) => {
       actions.joinRoom(roomId)
+    })
+
+    socket.on('room.left', (roomId) => {
+      actions.leaveRoom(roomId)
     })
 
     // socket.on('room.info', (table) => {
@@ -39,8 +47,8 @@ class Socket {
       actions.receiveRoomSettings(roomId, settings)
     })
 
-    socket.on('room.users', (roomId, spectators, players) => {
-      actions.receiveRoomUsers(roomId, spectators, players)
+    socket.on('room.users', (roomId, users, players) => {
+      actions.receiveRoomUsers(roomId, users, players)
     })
 
     socket.on('room.user_joined', (roomId, user) => {
@@ -54,6 +62,22 @@ class Socket {
     socket.on('chat.message', (userId, message) => {
       let data = { userId, message }
       actions.receiveChatMessage(data)
+    })
+
+    socket.on('game.user_joined', (roomId, userId, seat) => {
+      actions.receiveGameUserJoined(roomId, userId, seat)
+    })
+
+    socket.on('game.user_left', (roomId, userId) => {
+      actions.receiveGameUserLeft(roomId, userId)
+    })
+
+    socket.on('game.started', (roomId, status) => {
+      actions.receiveGameStarted(roomId, status)
+    })
+
+    socket.on('game.stopped', (roomId, status) => {
+      actions.receiveGameStopped(roomId, status)
     })
   }
 
