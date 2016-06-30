@@ -18,7 +18,7 @@ export default function (io, realm) {
       try {
         User.find({ realm, id: { $in: room.users }})
           .then(users => {
-            target.emit('room.users', room.id, users, room.players)
+            target.emit('room.users', room.id, users, room.getPlayerIds())
           })
       }
       catch(e) {
@@ -26,11 +26,11 @@ export default function (io, realm) {
       }
     },
 
-    roomSettings: async (target = io, room) => {
+    roomSettings: (target = io, room) => {
       target.emit('room.settings', room.id, room.settings)
     },
 
-    rooms: async (target = io) => {
+    rooms: (target = io) => {
       try {
         Room.find({ realm })
           .then(rooms => rooms.map(room => room.toJSON()))
@@ -40,6 +40,20 @@ export default function (io, realm) {
       }
       catch(e) {
         console.log('emitRooms', e)
+      }
+    },
+
+    // FIXME: Improve performance?
+    gameStart: (target = io, room) => {
+      target.emit('game.started', room.id, room.status)
+      target.emit('game.cards', room.id, room.cards.board, room.cards.stack.length, room.cards.discard)
+
+      for (let seat in room.players) {
+        let player = room.players[seat]
+        User.findOne({ realm, id: player.id })
+          .then(user => {
+            io.to(user.socketId).emit('game.hand', room.id, player.cards)
+          })
       }
     },
   }

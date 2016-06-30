@@ -40,34 +40,28 @@ function sockets(server) {
     }
 
     socket.broadcast.emit('lobby.user_joined', user)
-    // emitLobbyUsers(socket)
+
     socket.emit('me', user)
     emit.rooms(socket)
 
     socket.on('disconnect', async () => {
       socket.broadcast.emit('lobby.user_left', user)
 
-      try {
-        user.socketId = null
-        await user.save()
-
-        let room = await Room.findOne({ realm, users: user.id }).exec()
-        if (room) {
-          socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
-          if (room.removeUser(user.id)) {
+      user.socketId = null
+      user.save().then((user) => {
+        Room.findOne({ realm, users: user.id })
+          .then((room) => {
+            socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
+            room.removeUser(user.id)
             room.save()
-          }
-        }
-      }
-      catch(e) {
-        console.log('disconnect', e)
-      }
+          })
+      })
     })
 
     socket.on('room.join', async (roomId) => {
       try {
         let check = await Room.findOne({ realm, users: user.id }).exec()
-        if (check) {
+        if (check && check.id != roomId) {
           socket.emit('exception', 'room.join', 'already in a room')
           return
         }
@@ -91,36 +85,43 @@ function sockets(server) {
       }
     })
 
-    /**
-     * FIXME: When the user who is a player, leaves, emit game.user_left (correctly...)
-     * TODO: Stop the game if the user was a player and the game was running
-     * TODO: If the room is deleted, notify the lobby about it
-     */
     socket.on('room.leave', async (roomId) => {
+      let stoppedGame = false
       Room.findOne({ realm, users: user.id })
         .then((room) => {
           if (!room.users.includes(user.id)) {
             throw new Error('room.leave: not in room')
           }
 
+          // Returns true if the user was also removed from the playing list
           if (room.removeUser(user.id)) {
-            return room.save()
+            // Returns true if the game was running and was stopped
+            stoppedGame = room.stopGame()
           }
-          else {
-            return room
-          }
+
+          return room.save()
         })
         .catch((err) => {
           console.log(err)
         })
         .then((room) => {
-          socket.emit('room.left', room.id)
-          socket.leave(room.id)
           socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
+          socket.leave(room.id)
+
+          socket.emit('room.left', room.id)
           emit.rooms(socket)
           emit.lobbyUsers(socket)
-        }, (err) => {
-          console.log(err)
+
+          if (stoppedGame) {
+            io.to(room.id).emit('game.stopped', room.id, room.status)
+          }
+
+          if (room.users.length <= 0) {
+            room.remove()
+              .then(() => {
+                emit.rooms()
+              })
+          }
         })
     })
 
@@ -196,9 +197,10 @@ function sockets(server) {
             io.to(room.id).emit('game.user_joined', room.id, user.id, seat)
 
             if (room.status.gameStarted) {
-              io.to(room.id).emit('game.started', room.id, room.status)
+              emit.gameStart(io.to(room.id), room)
             }
           })
+          .catch(e => console.log('game.join', e))
       }
       catch(e) {
         console.log('game.join', e)

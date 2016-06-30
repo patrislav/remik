@@ -1,34 +1,72 @@
 
+import {Map, fromJS} from 'immutable'
 import { model, index } from 'mongoose-decorators'
 import User from './user'
-// TODO: Move this file into common directory
+import {startGame, stopGame} from '../rummy'
 import {phases} from '../../client/constants'
 
 const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
+const Player = (userId) => {
+  return {
+    id: userId,
+    cards: [],
+    drewFromDiscard: null,
+    melded: false,
+    madeFirstMove: false
+  }
+}
+
 @model({
   realm: { type: String },
-  settings: {
-    maxPlayers: { type: Number, default: 2 },
-    jokersPerDeck: { type: Number, default: 1 },
-    deckCount: { type: Number, default: 2 },
-    deckBack: { type: String, default: "classic" },
-    deckFront: { type: String, default: "classic" },
-    turnTime: { type: Number, default: 0 }
-  },
-  status: {
-    currentPlayer: { type: String, default: null },
-    phase: { type: String, default: phases.WAITING_FOR_PLAYERS },
-    turnStartedAt: { type: Date, default: null },
-    gameStarted: { type: Boolean, default: false }
-  },
-  users: { type: [String], default: [] },
+  settings: { type: Object, default: {
+    maxPlayers: 2,
+    jokersPerDeck: 1,
+    deckCount: 2,
+    deckBack: 'classic',
+    deckFront: 'classic',
+    turnTime: 0
+  } },
+  status: { type: Object, default: {
+    currentPlayer: null,
+    phase: phases.WAITING_FOR_PLAYERS,
+    turnStartedAt: null,
+    gameStarted: false
+  } },
+  cards: { type: Object, default: {
+    board: [],
+    stack: [],
+    discard: []
+  } },
   players: { type: Object, default: {} },
+  users: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
   creatorId: { type: String, default: null }
 })
 @index({ realm: 1 })
 class Room {
+
+  // setup() {
+  //   this.settings = {
+  //     maxPlayers: 2,
+  //     jokersPerDeck: 1,
+  //     deckCount: 2,
+  //     deckBack: 'classic',
+  //     deckFront: 'classic',
+  //     turnTime: 0
+  //   }
+  //   this.status = {
+  //     currentPlayer: null,
+  //     phase: phases.WAITING_FOR_PLAYERS,
+  //     turnStartedAt: null,
+  //     gameStarted: false
+  //   }
+  //   this.cards = {
+  //     board: [],
+  //     stack: [],
+  //     discard: []
+  //   }
+  // }
 
   get id() {
     return this._id
@@ -62,14 +100,7 @@ class Room {
       this.users.splice(index, 1)
     }
 
-    this.removePlayer(userId)
-
-    if (this.users.length <= 0) {
-      this.remove()
-      return false
-    }
-
-    return true
+    return this.removePlayer(userId)
   }
 
   /**
@@ -82,14 +113,14 @@ class Room {
   addPlayer(seat, userId) {
     // Return false if the user is already a player in this room
     for (let i in this.players) {
-      if (this.players[i] === userId) {
+      if (this.players[i] && this.players[i].id === userId) {
         return false
       }
     }
 
     if (this.players.hasOwnProperty(seat) && !this.players[seat]) {
       this.addUser(userId)
-      this.players[seat] = userId
+      this.players[seat] = Player(userId)
       this.markModified('players') // otherwise it isn't persisted
       return true
     }
@@ -105,7 +136,7 @@ class Room {
    */
   removePlayer(userId) {
     for (let key in this.players) {
-      if (this.players.hasOwnProperty(key) && this.players[key] === userId) {
+      if (this.players.hasOwnProperty(key) && this.players[key] && this.players[key].id === userId) {
         this.players[key] = null
         this.markModified('players') // otherwise it isn't persisted
         return true
@@ -122,10 +153,8 @@ class Room {
       return false
     }
 
-    this.status.gameStarted = true
-    this.status.phase = phases.CARD_TAKING
-    this.status.currentPlayer = randomSeat(this.players)
-    this.status.turnStartedAt = Date.now()
+    let state = startGame(this.toState())
+    this.fromState(state)
 
     return true
   }
@@ -135,10 +164,8 @@ class Room {
    */
   stopGame() {
     if (this.status.gameStarted) {
-      this.status.gameStarted = false
-      this.status.phase = phases.WAITING_FOR_PLAYERS
-      this.status.currentPlayer = null
-      this.status.turnStartedAt = null
+      let state = stopGame(this.toState())
+      this.fromState(state)
 
       return true
     }
@@ -161,19 +188,49 @@ class Room {
     return false
   }
 
-  // isPlayer(userId) {
-  //   return Object.values(this.players).includes(userId)
-  // }
+  getPlayerIds() {
+    let playerIds = {}
+    for (let i in this.players) {
+      if (this.players[i]) {
+        playerIds[i] = this.players[i].id
+      }
+      else {
+        playerIds[i] = null
+      }
+    }
+    return playerIds
+  }
+
+  // FIXME: (Maybe) ugly
+  toState() {
+    let { cards, players, status, settings } = this
+    let state = fromJS({
+      cards: fromJS(Object(cards)),
+      players: fromJS(players),
+      status: fromJS(Object(status)),
+      settings: fromJS(Object(settings))
+    })
+    return state
+  }
+
+  // FIXME: Ugly.
+  fromState(state) {
+    let { cards, players, status, settings } = state.toJS()
+    this.cards = cards
+    this.players = players
+    this.status = status
+    this.settings = settings
+  }
+
+  saveState(state) {
+    this.readState(state)
+    return this.save()
+  }
 
   static findById(realm, _id) {
     return this.findOne({ _id, realm }).exec()
   }
 
-}
-
-function randomSeat(players) {
-  let seats = Object.keys(players)
-  return seats[Math.floor(Math.random() * seats.length)]
 }
 
 export default Room
