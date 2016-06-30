@@ -45,15 +45,40 @@ function sockets(server) {
     emit.rooms(socket)
 
     socket.on('disconnect', async () => {
+      let wasPlayer = false, stoppedGame = false
       socket.broadcast.emit('lobby.user_left', user)
 
       user.socketId = null
       user.save().then((user) => {
         Room.findOne({ realm, users: user.id })
           .then((room) => {
+            // Returns true if the user was also removed from the playing list
+            wasPlayer = room.removeUser(user.id)
+            if (wasPlayer) {
+              // Returns true if the game was running and was stopped
+              stoppedGame = room.stopGame()
+            }
+
+            return room.save()
+          })
+          .then((room) => {
             socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
-            room.removeUser(user.id)
-            room.save()
+            socket.leave(room.id)
+
+            if (wasPlayer) {
+              io.to(room.id).emit('game.user_left', room.id, user.id)
+            }
+
+            if (stoppedGame) {
+              io.to(room.id).emit('game.stopped', room.id, room.status)
+            }
+
+            if (room.users.length <= 0) {
+              room.remove()
+                .then(() => {
+                  emit.rooms()
+                })
+            }
           })
       })
     })
@@ -86,7 +111,7 @@ function sockets(server) {
     })
 
     socket.on('room.leave', async (roomId) => {
-      let stoppedGame = false
+      let wasPlayer = false, stoppedGame = false
       Room.findOne({ realm, users: user.id })
         .then((room) => {
           if (!room.users.includes(user.id)) {
@@ -94,7 +119,8 @@ function sockets(server) {
           }
 
           // Returns true if the user was also removed from the playing list
-          if (room.removeUser(user.id)) {
+          wasPlayer = room.removeUser(user.id)
+          if (wasPlayer) {
             // Returns true if the game was running and was stopped
             stoppedGame = room.stopGame()
           }
@@ -111,6 +137,10 @@ function sockets(server) {
           socket.emit('room.left', room.id)
           emit.rooms(socket)
           emit.lobbyUsers(socket)
+
+          if (wasPlayer) {
+            io.to(room.id).emit('game.user_left', room.id, user.id)
+          }
 
           if (stoppedGame) {
             io.to(room.id).emit('game.stopped', room.id, room.status)

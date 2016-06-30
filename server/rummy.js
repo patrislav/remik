@@ -10,8 +10,6 @@ const rankCodes = generateRankCodes(ranks, rankSymbols)
 const INITIAL_CARDS = 13
 
 export function startGame(state) {
-  // console.log(state)
-
   let stack = shuffle(generateCards(state.get('settings').toJS()))
   state = dealCards(state.setIn(['cards', 'stack'], fromJS(stack)))
 
@@ -117,8 +115,6 @@ function generateRankCodes(ranks, rankSymbols) {
       rankCodes.push(rank.toString())
     }
   }
-
-  console.log(rankCodes)
 
   return rankCodes
 }
