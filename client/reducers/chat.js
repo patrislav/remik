@@ -11,6 +11,9 @@ const initialState = Map({
  */
 export default (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.SWITCH_SCREEN:
+      return initialState
+
     case actionTypes.RECEIVE_MESSAGE:
       return addMessage(state, action.data)
 
