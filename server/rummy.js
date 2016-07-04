@@ -10,6 +10,7 @@ const rankCodes = generateRankCodes(ranks, rankSymbols)
 const INITIAL_CARDS = 13
 
 export function startGame(state) {
+  state = clearBoard(state)
   let stack = shuffle(generateCards(state.get('settings').toJS()))
   state = dealCards(state.setIn(['cards', 'stack'], fromJS(stack)))
 
@@ -41,8 +42,8 @@ export function clearBoard(state) {
     discard: []
   }
   let players = state.get('players').toJS()
-  for (let player of players) {
-    player.cards = []
+  for (let i in players) {
+    players[i].cards = []
   }
   return state.set('cards', fromJS(cards)).set('players', fromJS(players))
 }

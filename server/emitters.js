@@ -45,8 +45,15 @@ export default function (io, realm) {
 
     // FIXME: Improve performance?
     gameStart: (target = io, room) => {
+      let data = {
+        board: room.cards.board,
+        stack: room.cards.stack.length,
+        discard: room.getLastDiscard(),
+        players: room.getPlayersCardNums()
+      }
+
       target.emit('game.started', room.id, room.status)
-      target.emit('game.cards', room.id, room.cards.board, room.cards.stack.length, room.cards.discard)
+      target.emit('game.cards', room.id, data)
 
       for (let seat in room.players) {
         let player = room.players[seat]

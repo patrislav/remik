@@ -46,28 +46,6 @@ const Player = (userId) => {
 @index({ realm: 1 })
 class Room {
 
-  // setup() {
-  //   this.settings = {
-  //     maxPlayers: 2,
-  //     jokersPerDeck: 1,
-  //     deckCount: 2,
-  //     deckBack: 'classic',
-  //     deckFront: 'classic',
-  //     turnTime: 0
-  //   }
-  //   this.status = {
-  //     currentPlayer: null,
-  //     phase: phases.WAITING_FOR_PLAYERS,
-  //     turnStartedAt: null,
-  //     gameStarted: false
-  //   }
-  //   this.cards = {
-  //     board: [],
-  //     stack: [],
-  //     discard: []
-  //   }
-  // }
-
   get id() {
     return this._id
   }
@@ -201,7 +179,28 @@ class Room {
     return playerIds
   }
 
-  // FIXME: (Maybe) ugly
+  /**
+   * Returns a players object with the values being number of cards held by
+   * each player
+   */
+  getPlayersCardNums() {
+    let playerCardNums = {}
+    for (let i in this.players) {
+      if (this.players[i]) {
+        playerCardNums[i] = this.players[i].cards.length
+      }
+      else {
+        playerCardNums[i] = null
+      }
+    }
+    return playerCardNums
+  }
+
+  getLastDiscard() {
+    return this.cards.discard[this.cards.discard.length-1]
+  }
+
+  // FIXME: (Surely) ugly
   toState() {
     let { cards, players, status, settings } = this
     let state = fromJS({
