@@ -1,0 +1,106 @@
+:global {
+  .entity.table-card-wrapper {
+    width: 62px;
+    height: 86px;
+    position: absolute;
+
+    & > .playing-card {
+      width: 62px;
+      height: 86px;
+    }
+  }
+
+  .entity.hand-card-wrapper {
+    width: 100px;
+    height: 140px;
+    top: 15px;
+    position: absolute;
+
+    & > .playing-card {
+      width: 100px;
+      height: 140px;
+    }
+  }
+
+  .entity.table-card-wrapper:hover,
+  .entity.table-card-wrapper:focus,
+  .entity.table-card-wrapper.focus {
+    top: -15px;
+    height: 101px;
+
+    & > .playing-card {
+      // box-shadow: 1px 1px 60px #70a;
+    }
+  }
+
+  .entity.hand-card-wrapper:hover,
+  .entity.hand-card-wrapper:focus,
+  .entity.hand-card-wrapper.focus,
+  .entity.hand-card-wrapper.selected {
+    top: 0px;
+    height: 155px;
+  }
+
+  .entity.hand-card-wrapper.selected {
+    border-radius: 9px;
+    background-color: #229;
+
+    & > .playing-card {
+      opacity: 0.85;
+    }
+  }
+
+
+  $deck-list: (
+    "classic": ("blue", "red")
+  );
+
+  $suit-list: (
+    "c": "clubs",
+    "d": "diamonds",
+    "h": "hearts",
+    "s": "spades"
+  );
+
+  $value-list: (
+    "A": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "J": "11",
+    "Q": "12",
+    "K": "13"
+  );
+
+  @each $deck, $back-list in $deck-list {
+    @each $suit, $suitname in $suit-list {
+      @each $value, $valuename in $value-list {
+        .entity > .deck-#{$deck}.playing-card-#{$value}#{$suit} {
+          background: url("/images/cards/#{$deck}/#{$suitname}/#{$valuename}.png");
+          background-size: 100%;
+          background-repeat: no-repeat;
+        }
+      }
+
+      .entity > .deck-#{$deck}.playing-card-X#{$suit} {
+        background: url("/images/cards/#{$deck}/joker.png");
+        background-size: 100%;
+        background-repeat: no-repeat;
+      }
+    }
+
+    @each $back in $back-list {
+      .entity > .deck-#{$deck}.playing-card-back-#{$back} {
+        background: url("/images/cards/#{$deck}/back_#{$back}.png");
+        background-size: 100%;
+        background-repeat: no-repeat;
+      }
+    }
+  }
+}

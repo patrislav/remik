@@ -172,3 +172,21 @@ export function receiveGameStopped(roomId, status) {
     })
   }
 }
+
+export function receiveGameHand(roomId, cards) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.HAND,
+      roomId, cards
+    })
+  }
+}
+
+export function receiveGameCards(roomId, data) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.CARDS,
+      roomId, data
+    })
+  }
+}

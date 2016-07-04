@@ -63,7 +63,6 @@ export default class Play extends Component {
   }
 
   isSitting = () => {
-    console.log(this.props.players)
     for (let i of Object.keys(this.props.players)) {
       if (this.props.players[i] && this.props.players[i].id === this.props.user.id) {
         return true

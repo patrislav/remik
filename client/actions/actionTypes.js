@@ -27,6 +27,8 @@ export default {
     COUNTDOWN_STOPPED: 'game.countdownStopped',
     STARTED: 'game.started',
     STOPPED: 'game.stopped',
-    STATUS: 'game.status'
+    STATUS: 'game.status',
+    HAND: 'game.hand',
+    CARDS: 'game.cards'
   }
 }
