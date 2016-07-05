@@ -3,6 +3,8 @@ import User from './models/user'
 import Room from './models/room'
 import emitters from './emitters'
 
+import * as rummy from './rummy'
+
 function sockets(server) {
   const io = socketIO(server)
 
@@ -235,6 +237,45 @@ function sockets(server) {
       catch(e) {
         console.log('game.join', e)
       }
+    })
+
+    socket.on('game.draw_card', (pile) => {
+      let state = {}
+      Room.findOne({ realm, users: user.id })
+        .then((room) => {
+          if (!['stack', 'discard'].includes(pile)) {
+            throw new Error('Incorrect pile name')
+          }
+
+          let seat = room.getSeatByUserId(user.id)
+          state = rummy.drawCard(room.toState(), seat, pile)
+          if (state && !state.error) {
+            return room.saveState(state)
+          }
+          else {
+            // TODO: Something went wrong. Inform.
+          }
+        })
+        .then((room) => {
+          socket.emit('game.drew_card', room.id, user.id, room.status, state.get('drewCard'))
+
+          // TODO: Temporary!!!
+          let data = {
+            board: room.cards.board,
+            stack: room.cards.stack.length,
+            discard: room.getLastDiscard(),
+            players: room.getPlayersCardNums()
+          }
+          io.to(room.id).emit('game.cards', room.id, data)
+          for (let seat in room.players) {
+            let player = room.players[seat]
+            if (player.id === user.id) {
+              socket.emit('game.hand', room.id, player.cards)
+              break
+            }
+          }
+        })
+        .catch(e => console.log('game.draw_card', e))
     })
 
     socket.on('game.leave', async () => {

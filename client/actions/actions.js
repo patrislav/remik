@@ -190,3 +190,12 @@ export function receiveGameCards(roomId, data) {
     })
   }
 }
+
+export function receiveGameDrewCard(roomId, userId, status, card) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.DREW_CARD,
+      roomId, userId, status, card
+    })
+  }
+}

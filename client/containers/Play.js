@@ -56,7 +56,10 @@ export default class Play extends Component {
           <Chat />
         </aside>
         <main>
-          <GameView />
+          <GameView
+            onDrawFromStack={this._onDrawFromStack}
+            onDrawFromDiscard={this._onDrawFromDiscard}
+            />
         </main>
       </div>
     )
@@ -86,5 +89,13 @@ export default class Play extends Component {
   _onLeave = (event) => {
     io.socket.emit('room.leave')
     event.preventDefault()
+  }
+
+  _onDrawFromStack = () => {
+    io.socket.emit('game.draw_card', 'stack')
+  }
+
+  _onDrawFromDiscard = () => {
+    io.socket.emit('game.draw_card', 'discard')
   }
 }

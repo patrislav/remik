@@ -200,6 +200,14 @@ class Room {
     return this.cards.discard[this.cards.discard.length-1]
   }
 
+  getSeatByUserId(userId) {
+    for (let i in this.players) {
+      if (this.players[i] && this.players[i].id == userId) {
+        return i
+      }
+    }
+  }
+
   // FIXME: (Surely) ugly
   toState() {
     let { cards, players, status, settings } = this
@@ -222,7 +230,7 @@ class Room {
   }
 
   saveState(state) {
-    this.readState(state)
+    this.fromState(state)
     return this.save()
   }
 

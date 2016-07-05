@@ -14,17 +14,24 @@ export default class PlayProfile extends Component {
   static defaultProps = {
     onClick: () => {},
     user: null,
-    numCards: 0
+    numCards: -1
   }
 
   render() {
     return (
-      <div className="playProfile"><img src={getProfilePictureUrl(this.props.user)} /></div>
+      <div className="playProfile">
+        <img src={getProfilePictureUrl(this.props.user)} />
+        <span>{this.showNumCards()}</span>
+      </div>
     )
   }
 
   _onClick = (event) => {
     this.props.onClick()
     event.preventDefault()
+  }
+
+  showNumCards = () => {
+    return (this.props.numCards >= 0 ? this.props.numCards : '')
   }
 }

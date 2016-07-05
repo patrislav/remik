@@ -48,17 +48,26 @@ export function clearBoard(state) {
   return state.set('cards', fromJS(cards)).set('players', fromJS(players))
 }
 
-export function meld(state, player, cards) {
+export function meld(state, playerSeat, cards) {
   // TODO
   return state
 }
 
-export function takeCard(state, player, pile) {
-  // TODO
-  return state
+export function drawCard(state, playerSeat, pile) {
+  let stack = state.getIn(['cards', 'stack']).toJS(),
+    player = state.getIn(['players', playerSeat]).toJS()
+
+  // TODO: Add a check if the player CAN draw the card
+
+  let drewCard = stack.pop()
+  player.cards.push(drewCard)
+
+  return state.setIn(['cards', 'stack'], fromJS(stack))
+    .setIn(['players', playerSeat], fromJS(player))
+    .set('drewCard', drewCard)
 }
 
-export function finishTurn(state, player, discarded) {
+export function finishTurn(state, playerSeat, discarded) {
   // TODO
   return state
 }

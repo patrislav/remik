@@ -6,11 +6,12 @@ import {phases} from '../constants'
 const initialState = Map({
   screen: 'preload',
   user: null,
+  seat: null,
 
   // GAME DATA
   status: Map({
     gameStarted: false,
-    phase: phases.WAITING,
+    phase: phases.WAITING_FOR_PLAYERS,
     currentPlayer: null,
     turnStartedAt: null
   }),
@@ -50,6 +51,21 @@ export default (state = initialState, action) => {
 
     case actionTypes.game.CARDS:
       return state.update('cards', c => c.merge(action.data))
+
+    case actionTypes.game.DREW_CARD:
+      return state.update('status', s => s.merge(action.status))
+
+    case actionTypes.game.USER_JOINED:
+      if (action.user.id === state.get('user').id) {
+        state = state.set('seat', action.seat)
+      }
+      return state
+
+    case actionTypes.game.USER_LEFT:
+      if (action.userId === state.get('user').id) {
+        state = state.set('seat', null)
+      }
+      return state
 
     default:
       return state

@@ -7,7 +7,7 @@ export default class GameView extends Component {
   render() {
     return (
       <section className='gameView'>
-        <GameAreaView />
+        <GameAreaView {...this.props} />
         <HandView />
       </section>
     )

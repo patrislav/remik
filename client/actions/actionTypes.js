@@ -29,6 +29,7 @@ export default {
     STOPPED: 'game.stopped',
     STATUS: 'game.status',
     HAND: 'game.hand',
-    CARDS: 'game.cards'
+    CARDS: 'game.cards',
+    DREW_CARD: 'game.drew_card'
   }
 }
