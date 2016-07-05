@@ -18,7 +18,7 @@ const AUTOPREFIXER_BROWSERS = [
   'iOS >= 7',
   'Opera >= 12',
   'Safari >= 7.1',
-];
+]
 
 let nodeModules = {}
 fs.readdirSync('node_modules')
@@ -68,7 +68,8 @@ const baseConfig = {
         loaders: [
           'style',
           `css-loader?${JSON.stringify({
-            sourceMap: DEBUG,
+            sourceMap: false,
+            // sourceMap: DEBUG,
             // CSS Modules https://github.com/css-modules/css-modules
             modules: true,
             localIdentName: DEBUG ? '[name]_[local]_[hash:base64:3]' : '[hash:base64:4]',
@@ -76,7 +77,8 @@ const baseConfig = {
             minimize: !DEBUG,
           })}`,
           `sass-loader?${JSON.stringify({
-            sourceMap: DEBUG
+            sourceMap: false
+            // sourceMap: DEBUG
           })}`,
           'postcss-loader?parser=postcss-scss',
         ],
@@ -125,25 +127,30 @@ const baseConfig = {
     cached: VERBOSE,
     cachedAssets: VERBOSE,
   },
-};
+}
 
 export const clientConfig = extend(true, {}, baseConfig, {
   entry: path.resolve(__dirname, '../client/index.js'),
   output: {
     path: path.resolve(__dirname, '../build', NODE_ENV, 'public/scripts'),
+    publicPath: '/scripts/',
     filename: 'application.js'
   },
 
   plugins: [
-    new webpack.optimize.UglifyJsPlugin()
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
   ],
   resolve: {
     root: path.resolve(__dirname, '../client'),
     modulesDirectories: ['node_modules'],
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.json']
+    // extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.json']
   },
   devtool: 'source-map'
-});
+})
 
 export const serverConfig = extend(true, {}, baseConfig, {
   entry: path.resolve(__dirname, '../server/index.js'),
@@ -167,7 +174,7 @@ export const serverConfig = extend(true, {}, baseConfig, {
   //   extensions: ['', '.js', '.json']
   // },
   devtool: 'source-map'
-});
+})
 
 
-export default [clientConfig, serverConfig];
+export default [clientConfig, serverConfig]

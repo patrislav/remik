@@ -82,14 +82,14 @@
     @each $suit, $suitname in $suit-list {
       @each $value, $valuename in $value-list {
         .entity > .deck-#{$deck}.playing-card-#{$value}#{$suit} {
-          background: url("/images/cards/#{$deck}/#{$suitname}/#{$valuename}.png");
+          background: url("~assets/images/cards/#{$deck}/#{$suitname}/#{$valuename}.png");
           background-size: 100%;
           background-repeat: no-repeat;
         }
       }
 
-      .entity > .deck-#{$deck}.playing-card-X#{$suit} {
-        background: url("/images/cards/#{$deck}/joker.png");
+      .entity > .deck-#{$deck}.playing-card-X {
+        background: url("~assets/images/cards/#{$deck}/joker.png");
         background-size: 100%;
         background-repeat: no-repeat;
       }
@@ -97,7 +97,7 @@
 
     @each $back in $back-list {
       .entity > .deck-#{$deck}.playing-card-back-#{$back} {
-        background: url("/images/cards/#{$deck}/back_#{$back}.png");
+        background: url("~assets/images/cards/#{$deck}/back_#{$back}.png");
         background-size: 100%;
         background-repeat: no-repeat;
       }
