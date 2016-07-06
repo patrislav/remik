@@ -30,6 +30,9 @@ export default {
     STATUS: 'game.status',
     HAND: 'game.hand',
     CARDS: 'game.cards',
-    DREW_CARD: 'game.drew_card'
+    DREW_CARD: 'game.drewCard',
+    DISCARDED: 'game.discarded',
+
+    SELECT_HAND_CARD: 'game.selectHandCard'
   }
 }

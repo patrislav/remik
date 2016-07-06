@@ -63,5 +63,16 @@ export default function (io, realm) {
           })
       }
     },
+
+    gameCards: (target = io, room) => {
+      let data = {
+        board: room.cards.board,
+        stack: room.cards.stack.length,
+        discard: room.getLastDiscard(),
+        players: room.getPlayersCardNums()
+      }
+
+      target.emit('game.cards', room.id, data)
+    }
   }
 }

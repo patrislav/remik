@@ -1,4 +1,4 @@
-import {Map, List} from 'immutable'
+import {Map, List, fromJS} from 'immutable'
 
 import actionTypes from '../actions/actionTypes'
 import {phases} from '../constants'
@@ -23,7 +23,7 @@ const initialState = Map({
     players: Map()
   }),
 
-  hand: []
+  hand: List()
 
 })
 
@@ -45,16 +45,24 @@ export default (state = initialState, action) => {
 
     case actionTypes.game.STOPPED:
       return state.update('status', s => s.merge(action.status))
-        .set('seat', null).set('hand', [])
+        .set('hand', initialState.get('hand'))
         .set('cards', initialState.get('cards'))
+        .set('seat', null)
 
-    case actionTypes.game.HAND:
-      return state.set('hand', action.cards)
+    case actionTypes.game.HAND: {
+      let cards = action.cards.map(code => Map({
+        code, selected: false
+      }))
+      return state.set('hand', fromJS(cards))
+    }
 
     case actionTypes.game.CARDS:
       return state.update('cards', c => c.merge(action.data))
 
     case actionTypes.game.DREW_CARD:
+      return state.update('status', s => s.merge(action.status))
+
+    case actionTypes.game.DISCARDED:
       return state.update('status', s => s.merge(action.status))
 
     case actionTypes.game.USER_JOINED:
@@ -68,6 +76,13 @@ export default (state = initialState, action) => {
         state = state.set('seat', null)
       }
       return state
+
+    case actionTypes.game.SELECT_HAND_CARD: {
+      return state.update('hand', hand => hand.updateIn(
+        [hand.findIndex(card => card.get('code') === action.code), 'selected'],
+        selected => !selected
+      ))
+    }
 
     default:
       return state

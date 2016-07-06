@@ -91,6 +91,10 @@ class Socket {
     socket.on('game.drew_card', (roomId, userId, status, card) => {
       actions.receiveGameDrewCard(roomId, userId, status, card)
     })
+
+    socket.on('game.discarded', (roomId, userId, status, card) => {
+      actions.receiveGameDiscarded(roomId, userId, status, card)
+    })
   }
 
   get socket() {

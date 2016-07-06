@@ -8,7 +8,7 @@ export default class GameView extends Component {
     return (
       <section className='gameView'>
         <GameAreaView {...this.props} />
-        <HandView />
+        <HandView {...this.props} />
       </section>
     )
   }

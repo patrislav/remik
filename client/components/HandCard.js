@@ -6,20 +6,19 @@ export default class HandCard extends Component {
   static propTypes = {
     code: PropTypes.string.isRequired,
     deck: PropTypes.string.isRequired,
-    x: PropTypes.number.isRequired
+    x: PropTypes.number.isRequired,
+    onClick: PropTypes.func,
+    selected: PropTypes.bool
   }
 
-  constructor() {
-    super()
-    this.state = {
-      selected: false
-    }
+  static defaultProps = {
+    selected: false
   }
 
   render() {
-    let className = `playing-card playing-card-${this.props.code} deck-${this.props.deck}`
+    let className = `playing-card playing-card-${this.getCode()} deck-${this.props.deck}`
     let wrapperClassName = "entity hand-card-wrapper"
-    if (this.state.selected) {
+    if (this.props.selected) {
       wrapperClassName += " selected"
     }
 
@@ -34,10 +33,12 @@ export default class HandCard extends Component {
     )
   }
 
+  getCode = () => {
+    return this.props.code.split('.')[0]
+  }
+
   _onClick = (event) => {
-    this.setState({
-      selected: !this.state.selected
-    })
+    if (this.props.onClick) this.props.onClick()
     event.preventDefault()
   }
 }

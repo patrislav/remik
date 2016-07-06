@@ -5,7 +5,7 @@ import HandCard from './HandCard'
 
 @connect(state => {
   return {
-    cards: state.game.get('hand')
+    cards: state.game.get('hand').toJS()
   }
 })
 export default class HandView extends Component {
@@ -17,11 +17,13 @@ export default class HandView extends Component {
       offset = (areaWidth - handWidth) / 2
 
     let cardElements = this.props.cards.map(
-      (code, index) => <HandCard
+      (card, index) => <HandCard
         key={index}
         deck="classic"
-        code={code}
+        code={card.code}
         x={offset + parseInt(index) * gutterWidth}
+        onClick={this._onClickCard(card.code)}
+        selected={card.selected}
       />
     )
 
@@ -30,5 +32,11 @@ export default class HandView extends Component {
         {cardElements}
       </div>
     )
+  }
+
+  _onClickCard = (cardCode) => {
+    return () => {
+      this.props.onSelectHandCard(cardCode)
+    }
   }
 }

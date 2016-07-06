@@ -199,3 +199,22 @@ export function receiveGameDrewCard(roomId, userId, status) {
     })
   }
 }
+
+export function receiveGameDiscarded(roomId, userId, status, card) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.DISCARDED,
+      roomId, userId, status, card
+    })
+  }
+}
+
+
+export function selectHandCard(code) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.SELECT_HAND_CARD,
+      code
+    })
+  }
+}

@@ -61,6 +61,8 @@ export default class Play extends Component {
           <GameView
             onDrawFromStack={this._onDrawFromStack}
             onDrawFromDiscard={this._onDrawFromDiscard}
+            onDiscard={this._onDiscard}
+            onSelectHandCard={this._onSelectHandCard}
             />
         </main>
       </div>
@@ -99,5 +101,13 @@ export default class Play extends Component {
 
   _onDrawFromDiscard = () => {
     io.socket.emit('game.draw_card', 'discard')
+  }
+
+  _onDiscard = (code) => {
+    io.socket.emit('game.discard', code)
+  }
+
+  _onSelectHandCard = (code) => {
+    this.actions.selectHandCard(code)
   }
 }

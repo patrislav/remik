@@ -261,15 +261,9 @@ function sockets(server) {
         })
         .then((room) => {
           io.to(room.id).emit('game.drew_card', room.id, user.id, room.status)
+          emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          let data = {
-            board: room.cards.board,
-            stack: room.cards.stack.length,
-            discard: room.getLastDiscard(),
-            players: room.getPlayersCardNums()
-          }
-          io.to(room.id).emit('game.cards', room.id, data)
           for (let seat in room.players) {
             let player = room.players[seat]
             if (player.id === user.id) {
@@ -279,6 +273,35 @@ function sockets(server) {
           }
         })
         .catch(e => console.log('game.draw_card', e))
+    })
+
+    socket.on('game.discard', (code) => {
+      let state = {}
+      Room.findOne({ realm, users: user.id})
+        .then((room) => {
+          let seat = room.getSeatByUserId(user.id)
+          if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
+            state = rummy.finishTurn(room.toState(), seat, code)
+            return room.saveState(state)
+          }
+          else {
+            throw new Error("Not player's turn!")
+          }
+        })
+        .then((room) => {
+          io.to(room.id).emit('game.discarded', room.id, user.id, room.status, state.get('discardedCard'))
+          emit.gameCards(io.to(room.id), room)
+
+          // TODO: Temporary!!!
+          for (let seat in room.players) {
+            let player = room.players[seat]
+            if (player.id === user.id) {
+              socket.emit('game.hand', room.id, player.cards)
+              break
+            }
+          }
+        })
+        .catch(e => console.log('game.discard', e))
     })
 
     socket.on('game.leave', async () => {

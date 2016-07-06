@@ -27,6 +27,7 @@ export function startGame(state) {
 }
 
 export function stopGame(state) {
+  state = clearBoard(state)
   let status = {
     gameStarted: false,
     phase: phases.WAITING_FOR_PLAYERS,
@@ -68,13 +69,13 @@ export function drawCard(state, playerSeat, pileName) {
 
   return state.setIn(['cards', pileName], fromJS(pile))
     .setIn(['players', playerSeat], fromJS(player))
-    .set('drewCard', drewCard)
     .setIn(['status', 'phase'], phases.BASE_TURN)
+    .set('drewCard', drewCard)
 }
 
 export function finishTurn(state, playerSeat, discarded) {
   let players = state.get('players').toJS(),
-    discardPile = state.getIn(['cards', 'discard']).toJS()
+    discardPile = state.getIn(['cards', 'discard']).toJS(),
     player = players[playerSeat]
 
   let index = player.cards.indexOf(discarded)
@@ -89,6 +90,7 @@ export function finishTurn(state, playerSeat, discarded) {
     .setIn(['cards', 'discard'], fromJS(discardPile))
     .setIn(['status', 'currentPlayer'], nextPlayerSeat(playerSeat, players))
     .setIn(['status', 'phase'], phases.CARD_TAKING)
+    .set('discardedCard', discarded)
 }
 
 function dealCards(state) {
@@ -115,12 +117,12 @@ function generateCards(settings) {
   for (let i = 0; i < deckCount; i++) {
     for (let suit of suitSymbols) {
       for (let rankCode of rankCodes) {
-        stack.push(rankCode + suit)
+        stack.push(rankCode + suit + '.' + i)
       }
     }
 
     for (let i = 0; i < jokersPerDeck; i++) {
-      stack.push('X')
+      stack.push('X.' + i)
     }
   }
 
@@ -170,7 +172,7 @@ function nextPlayerSeat(currentPlayerSeat, players) {
     return null
   }
 
-  if (PLAYER_COLOURS[index+1]) {
+  if (players[PLAYER_COLOURS[index+1]]) {
     return PLAYER_COLOURS[index+1]
   }
   else {
