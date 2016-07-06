@@ -20,7 +20,7 @@ const initialState = Map({
     board: [],
     discard: null,
     stack: 0,
-    players: {}
+    players: Map()
   }),
 
   hand: []

@@ -12,7 +12,8 @@ import GameView from '../components/GameView'
 @connect(state => {
   return {
     user: state.game.get('user'),
-    players: state.room.get('players').toJS()
+    players: state.room.get('players').toJS(),
+    playerCards: state.game.getIn(['cards', 'players']).toJS()
   }
 })
 export default class Play extends Component {
@@ -48,6 +49,7 @@ export default class Play extends Component {
         <aside>
           <UserList
             players={this.props.players}
+            playerCards={this.props.playerCards}
             onSitDown={this._onSitDown}
             onStandUp={this._onStandUp}
             onLeave={this._onLeave}

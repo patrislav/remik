@@ -12,6 +12,7 @@ export default class UserList extends Component {
     onStandUp: PropTypes.func,
     onLeave: PropTypes.func,
     players: PropTypes.object,
+    playerCards: PropTypes.object,
     currentlySitting: PropTypes.bool
   }
 
@@ -20,6 +21,7 @@ export default class UserList extends Component {
     onStandUp: () => {},
     onLeave: () => {},
     players: {},
+    playerCards: {},
     currentlySitting: false
   }
 
@@ -35,10 +37,14 @@ export default class UserList extends Component {
 
   profileElements = (users) => {
     let elements = []
+    console.log(this.props.playerCards)
     for (let i in users) {
       let element
       if (users[i]) {
-        element = <PlayProfile user={users[i]} />
+        element = <PlayProfile
+          user={users[i]}
+          numCards={this.props.playerCards[i]}
+          />
       }
       else {
         element = <SitDownButton onClick={this.props.onSitDown(i)} />
