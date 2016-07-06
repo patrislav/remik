@@ -45,6 +45,8 @@ export default (state = initialState, action) => {
 
     case actionTypes.game.STOPPED:
       return state.update('status', s => s.merge(action.status))
+        .set('seat', null).set('hand', [])
+        .set('cards', initialState.get('cards'))
 
     case actionTypes.game.HAND:
       return state.set('hand', action.cards)

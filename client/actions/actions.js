@@ -191,11 +191,11 @@ export function receiveGameCards(roomId, data) {
   }
 }
 
-export function receiveGameDrewCard(roomId, userId, status, card) {
+export function receiveGameDrewCard(roomId, userId, status) {
   return dispatch => {
     dispatch({
       type: actionTypes.game.DREW_CARD,
-      roomId, userId, status, card
+      roomId, userId, status
     })
   }
 }

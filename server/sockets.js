@@ -5,6 +5,9 @@ import emitters from './emitters'
 
 import * as rummy from './rummy'
 
+// TODO: Move this file into common directory
+import {phases} from '../client/constants'
+
 function sockets(server) {
   const io = socketIO(server)
 
@@ -248,16 +251,16 @@ function sockets(server) {
           }
 
           let seat = room.getSeatByUserId(user.id)
-          state = rummy.drawCard(room.toState(), seat, pile)
-          if (state && !state.error) {
+          if (room.status.currentPlayer === seat && room.status.phase === phases.CARD_TAKING) {
+            state = rummy.drawCard(room.toState(), seat, pile)
             return room.saveState(state)
           }
           else {
-            // TODO: Something went wrong. Inform.
+            throw new Error("Not player's turn!")
           }
         })
         .then((room) => {
-          socket.emit('game.drew_card', room.id, user.id, room.status, state.get('drewCard'))
+          io.to(room.id).emit('game.drew_card', room.id, user.id, room.status)
 
           // TODO: Temporary!!!
           let data = {

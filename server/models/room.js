@@ -5,8 +5,6 @@ import User from './user'
 import {startGame, stopGame} from '../rummy'
 import {phases} from '../../client/constants'
 
-const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
-
 const Player = (userId) => {
   return {
     id: userId,

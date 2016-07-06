@@ -8,6 +8,7 @@ const ranks = [1,2,3,4,5,6,7,8,9,10,11,12,13],
   suitSymbols = ['s', 'h', 'd', 'c']
 const rankCodes = generateRankCodes(ranks, rankSymbols)
 const INITIAL_CARDS = 13
+const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
 export function startGame(state) {
   state = clearBoard(state)
@@ -53,23 +54,41 @@ export function meld(state, playerSeat, cards) {
   return state
 }
 
-export function drawCard(state, playerSeat, pile) {
-  let stack = state.getIn(['cards', 'stack']).toJS(),
+// TODO: More checks!!!
+export function drawCard(state, playerSeat, pileName) {
+  let pile = state.getIn(['cards', pileName]).toJS(),
     player = state.getIn(['players', playerSeat]).toJS()
 
-  // TODO: Add a check if the player CAN draw the card
-
-  let drewCard = stack.pop()
+  let drewCard = pile.pop()
   player.cards.push(drewCard)
 
-  return state.setIn(['cards', 'stack'], fromJS(stack))
+  if (pileName === 'discard') {
+    player.drewFromDiscard = drewCard
+  }
+
+  return state.setIn(['cards', pileName], fromJS(pile))
     .setIn(['players', playerSeat], fromJS(player))
     .set('drewCard', drewCard)
+    .setIn(['status', 'phase'], phases.BASE_TURN)
 }
 
 export function finishTurn(state, playerSeat, discarded) {
-  // TODO
-  return state
+  let players = state.get('players').toJS(),
+    discardPile = state.getIn(['cards', 'discard']).toJS()
+    player = players[playerSeat]
+
+  let index = player.cards.indexOf(discarded)
+  if (index < 0) {
+    throw new Error("The card that's about to be discarded is not in player's hand")
+  }
+
+  player.cards.splice(index, 1)
+  discardPile.push(discarded)
+
+  return state.setIn(['players', playerSeat], fromJS(player))
+    .setIn(['cards', 'discard'], fromJS(discardPile))
+    .setIn(['status', 'currentPlayer'], nextPlayerSeat(playerSeat, players))
+    .setIn(['status', 'phase'], phases.CARD_TAKING)
 }
 
 function dealCards(state) {
@@ -143,4 +162,18 @@ function shuffle(array) {
 function randomSeat(players) {
   let seats = Object.keys(players)
   return seats[Math.floor(Math.random() * seats.length)]
+}
+
+function nextPlayerSeat(currentPlayerSeat, players) {
+  let index = PLAYER_COLOURS.indexOf(currentPlayerSeat)
+  if (index < 0) {
+    return null
+  }
+
+  if (PLAYER_COLOURS[index+1]) {
+    return PLAYER_COLOURS[index+1]
+  }
+  else {
+    return PLAYER_COLOURS[0]
+  }
 }
