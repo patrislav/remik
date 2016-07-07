@@ -10,6 +10,7 @@ const rankCodes = generateRankCodes(ranks, rankSymbols)
 const INITIAL_CARDS = 13
 const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
+// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function startGame(state) {
   state = clearBoard(state)
   let stock = shuffle(generateCards(state.get('settings').toJS()))
@@ -56,23 +57,41 @@ export function meld(state, playerSeat, cards) {
 }
 
 // TODO: More checks!!!
+// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function drawCard(state, playerSeat, pileName) {
-  let pile = state.getIn(['cards', pileName]).toJS(),
-    player = state.getIn(['players', playerSeat]).toJS()
+  let player = state.getIn(['players', playerSeat]).toJS(),
+    stockPile = state.getIn(['cards', 'stock']).toJS(),
+    discardPile = state.getIn(['cards', 'discard']).toJS()
 
-  let drewCard = pile.pop()
-  player.cards.push(drewCard)
+  let drewCard
+  if (pileName === 'stock') {
+    drewCard = stockPile.pop()
 
-  if (pileName === 'discard') {
+    // If the stock is empty, use the shuffled cards from the discard pile
+    if (stockPile.length <= 0) {
+      let lastCard = discardPile.pop()
+      stockPile = shuffle(discardPile.slice())
+      discardPile = [lastCard]
+    }
+  }
+  else if (pileName === 'discard') {
+    drewCard = discardPile.pop()
     player.drewFromDiscard = drewCard
   }
+  else {
+    throw new Error("The pile name must be either 'stock' or 'discard'")
+  }
 
-  return state.setIn(['cards', pileName], fromJS(pile))
+  player.cards.push(drewCard)
+
+  return state.setIn(['cards', 'stock'], fromJS(stockPile))
+    .setIn(['cards', 'discard'], fromJS(discardPile))
     .setIn(['players', playerSeat], fromJS(player))
     .setIn(['status', 'phase'], phases.BASE_TURN)
     .set('drewCard', drewCard)
 }
 
+// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function finishTurn(state, playerSeat, discarded) {
   let players = state.get('players').toJS(),
     discardPile = state.getIn(['cards', 'discard']).toJS(),
@@ -93,6 +112,7 @@ export function finishTurn(state, playerSeat, discarded) {
     .set('discardedCard', discarded)
 }
 
+// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 function dealCards(state) {
   let stock = state.getIn(['cards', 'stock']).toJS(),
     discard = state.getIn(['cards', 'discard']).toJS(),
