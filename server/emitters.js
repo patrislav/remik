@@ -47,7 +47,7 @@ export default function (io, realm) {
     gameStart: (target = io, room) => {
       let data = {
         board: room.cards.board,
-        stack: room.cards.stack.length,
+        stock: room.cards.stock.length,
         discard: room.getLastDiscard(),
         players: room.getPlayersCardNums()
       }
@@ -67,7 +67,7 @@ export default function (io, realm) {
     gameCards: (target = io, room) => {
       let data = {
         board: room.cards.board,
-        stack: room.cards.stack.length,
+        stock: room.cards.stock.length,
         discard: room.getLastDiscard(),
         players: room.getPlayersCardNums()
       }

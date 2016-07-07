@@ -246,7 +246,7 @@ function sockets(server) {
       let state = {}
       Room.findOne({ realm, users: user.id })
         .then((room) => {
-          if (!['stack', 'discard'].includes(pile)) {
+          if (!['stock', 'discard'].includes(pile)) {
             throw new Error('Incorrect pile name')
           }
 

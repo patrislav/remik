@@ -12,8 +12,8 @@ const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 
 export function startGame(state) {
   state = clearBoard(state)
-  let stack = shuffle(generateCards(state.get('settings').toJS()))
-  state = dealCards(state.setIn(['cards', 'stack'], fromJS(stack)))
+  let stock = shuffle(generateCards(state.get('settings').toJS()))
+  state = dealCards(state.setIn(['cards', 'stock'], fromJS(stock)))
 
   let status = {
     gameStarted: true,
@@ -40,7 +40,7 @@ export function stopGame(state) {
 export function clearBoard(state) {
   let cards = {
     board: [],
-    stack: [],
+    stock: [],
     discard: []
   }
   let players = state.get('players').toJS()
@@ -94,39 +94,39 @@ export function finishTurn(state, playerSeat, discarded) {
 }
 
 function dealCards(state) {
-  let stack = state.getIn(['cards', 'stack']).toJS(),
+  let stock = state.getIn(['cards', 'stock']).toJS(),
     discard = state.getIn(['cards', 'discard']).toJS(),
     players = state.get('players').toJS()
   for (let i = 0; i < INITIAL_CARDS; i++) {
     for (let seat in players) {
-      players[seat].cards.push(stack.pop())
+      players[seat].cards.push(stock.pop())
     }
   }
 
-  discard.push(stack.pop())
+  discard.push(stock.pop())
 
-  return state.setIn(['cards', 'stack'], fromJS(stack))
+  return state.setIn(['cards', 'stock'], fromJS(stock))
     .setIn(['cards', 'discard'], fromJS(discard))
     .set('players', fromJS(players))
 }
 
 function generateCards(settings) {
   let { deckCount, jokersPerDeck } = settings
-  let stack = []
+  let stock = []
 
   for (let i = 0; i < deckCount; i++) {
     for (let suit of suitSymbols) {
       for (let rankCode of rankCodes) {
-        stack.push(rankCode + suit + '.' + i)
+        stock.push(rankCode + suit + '.' + i)
       }
     }
 
     for (let i = 0; i < jokersPerDeck; i++) {
-      stack.push('X.' + i)
+      stock.push('X.' + i)
     }
   }
 
-  return stack
+  return stock
 }
 
 // FIXME: Ugly!

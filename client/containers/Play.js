@@ -59,7 +59,7 @@ export default class Play extends Component {
         </aside>
         <main>
           <GameView
-            onDrawFromStack={this._onDrawFromStack}
+            onDrawFromStock={this._onDrawFromStock}
             onDrawFromDiscard={this._onDrawFromDiscard}
             onDiscard={this._onDiscard}
             onSelectHandCard={this._onSelectHandCard}
@@ -95,8 +95,8 @@ export default class Play extends Component {
     event.preventDefault()
   }
 
-  _onDrawFromStack = () => {
-    io.socket.emit('game.draw_card', 'stack')
+  _onDrawFromStock = () => {
+    io.socket.emit('game.draw_card', 'stock')
   }
 
   _onDrawFromDiscard = () => {

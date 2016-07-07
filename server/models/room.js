@@ -33,7 +33,7 @@ const Player = (userId) => {
   } },
   cards: { type: Object, default: {
     board: [],
-    stack: [],
+    stock: [],
     discard: []
   } },
   players: { type: Object, default: {} },

@@ -19,7 +19,7 @@ const initialState = Map({
   cards: Map({
     board: [],
     discard: null,
-    stack: 0,
+    stock: 0,
     players: Map()
   }),
 

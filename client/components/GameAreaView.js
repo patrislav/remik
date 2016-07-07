@@ -2,14 +2,14 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {phases} from '../constants'
 
-import StackPile from './StackPile'
+import StockPile from './StockPile'
 import DiscardPile from './DiscardPile'
 
 @connect(state => {
   return {
     gameStarted: state.game.getIn(['status', 'gameStarted']),
     phase: state.game.getIn(['status', 'phase']),
-    stack: state.game.getIn(['cards', 'stack']),
+    stock: state.game.getIn(['cards', 'stock']),
     discard: state.game.getIn(['cards', 'discard']),
     hand: state.game.get('hand'),
     isCurrent: state.game.getIn(['status', 'currentPlayer']) === state.game.get('seat')
@@ -20,11 +20,11 @@ export default class GameAreaView extends Component {
     if (this.props.gameStarted) {
       return (
         <div className="gameAreaView">
-          <StackPile
+          <StockPile
             deck="classic"
             back="blue"
-            numCards={this.props.stack}
-            onClick={this._onClickStack}
+            numCards={this.props.stock}
+            onClick={this._onClickStock}
             highlight={this.props.phase == phases.CARD_TAKING && this.props.isCurrent}
             />
           <DiscardPile
@@ -42,9 +42,9 @@ export default class GameAreaView extends Component {
 
   }
 
-  _onClickStack = () => {
+  _onClickStock = () => {
     if (this.props.phase == phases.CARD_TAKING && this.props.isCurrent) {
-      this.props.onDrawFromStack()
+      this.props.onDrawFromStock()
     }
   }
 

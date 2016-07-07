@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 
 import '../styles/cards.scss'
 
-export default class StackPile extends Component {
+export default class StockPile extends Component {
   static propTypes = {
     deck: PropTypes.string.isRequired,
     back: PropTypes.string.isRequired,
