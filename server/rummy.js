@@ -46,7 +46,9 @@ export function clearBoard(state) {
   }
   let players = state.get('players').toJS()
   for (let i in players) {
-    players[i].cards = []
+    if (players[i]) {
+      players[i].cards = []
+    }
   }
   return state.set('cards', fromJS(cards)).set('players', fromJS(players))
 }

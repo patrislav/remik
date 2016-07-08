@@ -45,7 +45,7 @@ export function joinRoom(roomId) {
 }
 
 export function leaveRoom(roomId) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch({
       type: actionTypes.room.LEAVE,
       roomId
@@ -54,6 +54,11 @@ export function leaveRoom(roomId) {
       type: actionTypes.SWITCH_SCREEN,
       screen: 'lobby'
     })
+    if (getState().game.getIn(['status', 'gameStarted'])) {
+      dispatch({
+        type: actionTypes.game.STOPPED
+      })
+    }
   }
 }
 

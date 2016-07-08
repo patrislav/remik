@@ -44,11 +44,12 @@ export default (state = initialState, action) => {
       return state.update('status', s => s.merge(action.status))
 
     case actionTypes.game.STOPPED:
-      return state.update('status', s => s.merge(action.status))
+      return state.set('status', initialState.get('status'))
         .set('hand', initialState.get('hand'))
         .set('cards', initialState.get('cards'))
-        .set('seat', null)
 
+    // TODO: Keep the selected state (and order) of the previous hand
+    // Alternatively, use ADD_HAND_CARD and REMOVE_HAND_CARD
     case actionTypes.game.HAND: {
       let cards = action.cards.map(code => Map({
         code, selected: false

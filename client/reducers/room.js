@@ -53,6 +53,9 @@ export default (state = initialState, action) => {
       //   }
       //   return players
       // })
+      state = state.update('players', players =>
+        players.map(player => (player ? player.id : null) === action.user.id ? null : player)
+      )
       return state.set('spectators', state.get('spectators').filter((user) => user.id !== action.user.id))
 
     case actionTypes.game.USER_JOINED:
