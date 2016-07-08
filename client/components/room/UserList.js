@@ -13,7 +13,8 @@ export default class UserList extends Component {
     onLeave: PropTypes.func,
     players: PropTypes.object,
     playerCards: PropTypes.object,
-    currentlySitting: PropTypes.bool
+    currentlySitting: PropTypes.bool,
+    currentPlayer: PropTypes.string
   }
 
   static defaultProps = {
@@ -22,7 +23,8 @@ export default class UserList extends Component {
     onLeave: () => {},
     players: {},
     playerCards: {},
-    currentlySitting: false
+    currentlySitting: false,
+    currentPlayer: ''
   }
 
   render() {
@@ -37,13 +39,13 @@ export default class UserList extends Component {
 
   profileElements = (users) => {
     let elements = []
-    console.log(this.props.playerCards)
     for (let i in users) {
       let element
       if (users[i]) {
         element = <PlayProfile
           user={users[i]}
           numCards={this.props.playerCards[i]}
+          isCurrent={this.props.currentPlayer === i}
           />
       }
       else {

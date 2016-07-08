@@ -48,13 +48,17 @@ export default (state = initialState, action) => {
         .set('hand', initialState.get('hand'))
         .set('cards', initialState.get('cards'))
 
-    // TODO: Keep the selected state (and order) of the previous hand
-    // Alternatively, use ADD_HAND_CARD and REMOVE_HAND_CARD
+    // Alternatively, use ADD_HAND_CARDS and REMOVE_HAND_CARDS
     case actionTypes.game.HAND: {
-      let cards = action.cards.map(code => Map({
-        code, selected: false
-      }))
-      return state.set('hand', fromJS(cards))
+      let newCards = action.cards
+        .filter(code => state.get('hand').findIndex(card => card.get('code') === code) < 0)
+        .map(code => Map({ code, selected: false }))
+      state = state.update('hand', hand =>
+        hand.filter(card => action.cards.indexOf(card.get('code')) >= 0)
+          .concat(newCards)
+      )
+
+      return state
     }
 
     case actionTypes.game.CARDS:

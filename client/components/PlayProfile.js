@@ -8,13 +8,15 @@ export default class PlayProfile extends Component {
   static propTypes = {
     onClick: PropTypes.func,
     user: PropTypes.object,
-    numCards: PropTypes.number
+    numCards: PropTypes.number,
+    isCurrent: PropTypes.bool
   }
 
   static defaultProps = {
     onClick: () => {},
     user: null,
-    numCards: -1
+    numCards: -1,
+    isCurrent: false
   }
 
   render() {
@@ -22,6 +24,7 @@ export default class PlayProfile extends Component {
       <div className="playProfile">
         <img src={getProfilePictureUrl(this.props.user)} />
         <span>{this.showNumCards()}</span>
+        {this.props.isCurrent && ' <--'}
       </div>
     )
   }

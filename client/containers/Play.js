@@ -13,7 +13,8 @@ import GameView from '../components/GameView'
   return {
     user: state.game.get('user'),
     players: state.room.get('players').toJS(),
-    playerCards: state.game.getIn(['cards', 'players']).toJS()
+    playerCards: state.game.getIn(['cards', 'players']).toJS(),
+    currentPlayer: state.game.getIn(['status', 'currentPlayer'])
   }
 })
 export default class Play extends Component {
@@ -54,6 +55,7 @@ export default class Play extends Component {
             onStandUp={this._onStandUp}
             onLeave={this._onLeave}
             currentlySitting={this.isSitting()}
+            currentPlayer={this.props.currentPlayer}
             />
           <Chat />
         </aside>

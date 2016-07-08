@@ -70,7 +70,6 @@ export default class GameAreaView extends Component {
   }
 
   canAddGroup = () => {
-    console.log('canAddGroup', this.isValidGroup(), this.props.phase, phases.BASE_TURN, this.props.isCurrent)
     return this.isValidGroup() && this.props.phase == phases.BASE_TURN && this.props.isCurrent
   }
 
