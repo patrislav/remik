@@ -66,7 +66,7 @@ function parseCardCode(code) {
     return { joker: 1, suit: 'X', rank: 'X' }
   }
 
-  const regex = new RegExp(`(${RANK_CODES.join('|')})(${SUIT_SYMBOLS.join('|')})`, 'g')
+  const regex = new RegExp(`(${RANK_CODES.join('|')}){1,2}(${SUIT_SYMBOLS.join('|')})`, 'g')
 
   const match = regex.exec(code)
 
