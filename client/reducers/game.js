@@ -1,7 +1,7 @@
 import {Map, List, fromJS} from 'immutable'
 
 import actionTypes from '../actions/actionTypes'
-import {phases} from '../constants'
+import {phases} from '../../common/constants'
 
 const initialState = Map({
   screen: 'preload',

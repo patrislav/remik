@@ -6,7 +6,7 @@ import emitters from './emitters'
 import * as rummy from './rummy'
 
 // TODO: Move this file into common directory
-import {phases} from '../client/constants'
+import {phases} from '../common/constants'
 
 function sockets(server) {
   const io = socketIO(server)
@@ -309,7 +309,7 @@ function sockets(server) {
           })
           .then((room) => {
             io.to(room.id).emit('game.user_left', room.id, user.id)
-            
+
             if (stoppedGame) {
               io.to(room.id).emit('game.stopped', room.id, room.status)
             }

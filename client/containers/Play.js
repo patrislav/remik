@@ -63,6 +63,7 @@ export default class Play extends Component {
             onDrawFromDiscard={this._onDrawFromDiscard}
             onDiscard={this._onDiscard}
             onSelectHandCard={this._onSelectHandCard}
+            onMeldNewGroup={this._onMeldNewGroup}
             />
         </main>
       </div>
@@ -109,5 +110,9 @@ export default class Play extends Component {
 
   _onSelectHandCard = (code) => {
     this.actions.selectHandCard(code)
+  }
+
+  _onMeldNewGroup = (cards) => {
+    io.socket.emit('game.meld_new', cards)
   }
 }

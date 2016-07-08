@@ -1,14 +1,12 @@
 import {fromJS} from 'immutable'
 // TODO: Move this file into common directory
-import {phases} from '../client/constants'
-
-// TODO: Move these into constants file
-const ranks = [1,2,3,4,5,6,7,8,9,10,11,12,13],
-  rankSymbols = {A: 1, J: 11, Q: 12, K: 13},
-  suitSymbols = ['s', 'h', 'd', 'c']
-const rankCodes = generateRankCodes(ranks, rankSymbols)
-const INITIAL_CARDS = 13
-const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
+import {
+  phases,
+  INITIAL_CARDS,
+  PLAYER_COLOURS,
+  SUIT_SYMBOLS,
+  RANK_CODES
+} from '../common/constants'
 
 // FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function startGame(state) {
@@ -54,8 +52,12 @@ export function clearBoard(state) {
 }
 
 export function meld(state, playerSeat, cards) {
-  // TODO
-  return state
+  // TODO checks and mutations
+  let change = {
+    type: 'meld',
+    playerSeat, cards
+  }
+  return state.update('changes', changes => changes.push(change))
 }
 
 // TODO: More checks!!!
@@ -93,25 +95,53 @@ export function drawCard(state, playerSeat, pileName) {
     .set('drewCard', drewCard)
 }
 
-// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function finishTurn(state, playerSeat, discarded) {
-  let players = state.get('players').toJS(),
-    discardPile = state.getIn(['cards', 'discard']).toJS(),
-    player = players[playerSeat]
+  state = applyChanges(state)
 
-  let index = player.cards.indexOf(discarded)
+  let players = state.get('players'),
+    discardPile = state.getIn(['cards', 'discard']),
+    player = players.get(playerSeat)
+
+  let index = player.get('cards').indexOf(discarded)
   if (index < 0) {
     throw new Error("The card that's about to be discarded is not in player's hand")
   }
 
-  player.cards.splice(index, 1)
-  discardPile.push(discarded)
+  player = player.update('cards', cards => cards.delete(index))
+  discardPile = discardPile.push(discarded)
 
-  return state.setIn(['players', playerSeat], fromJS(player))
-    .setIn(['cards', 'discard'], fromJS(discardPile))
+  return state.setIn(['players', playerSeat], player)
+    .setIn(['cards', 'discard'], discardPile)
     .setIn(['status', 'currentPlayer'], nextPlayerSeat(playerSeat, players))
     .setIn(['status', 'phase'], phases.CARD_TAKING)
     .set('discardedCard', discarded)
+}
+
+function applyChanges(state) {
+  let changes = state.get('changes'),
+    board = state.getIn(['cards', 'board']),
+    players = state.get('players')
+
+  changes.forEach(change => {
+    switch (change.type) {
+      case 'meld':
+        board = board.push(change.cards)
+        players = players.updateIn([change.playerSeat, 'cards'], cards =>
+          cards.filter(card => change.cards.indexOf(card) < 0)
+        )
+        break
+    }
+  })
+
+  changes = changes.clear()
+
+  return state.set('changes', changes)
+    .setIn(['cards', 'board'], board)
+    .set('players', players)
+}
+
+function rollbackChanges(state) {
+  return state.update('changes', changes => changes.clear())
 }
 
 // FIXME: Maybe use the Immutables themselves instead of converting using toJS?
@@ -137,41 +167,19 @@ function generateCards(settings) {
   let stock = []
 
   for (let i = 0; i < deckCount; i++) {
-    for (let suit of suitSymbols) {
-      for (let rankCode of rankCodes) {
+    for (let suit of SUIT_SYMBOLS) {
+      for (let rankCode of RANK_CODES) {
         stock.push(rankCode + suit + '.' + i)
       }
     }
 
-    for (let i = 0; i < jokersPerDeck; i++) {
-      stock.push('X.' + i)
+    for (let j = 0; j < jokersPerDeck; j++) {
+      stock.push('X' + j + '.' + i)
     }
   }
 
   return stock
 }
-
-// FIXME: Ugly!
-function generateRankCodes(ranks, rankSymbols) {
-  let rankCodes = []
-
-  for (let rank of ranks) {
-    let found = false
-    for (let symbol in rankSymbols) {
-      if (rankSymbols[symbol] === rank) {
-        rankCodes.push(symbol)
-        found = true
-      }
-    }
-
-    if (!found) {
-      rankCodes.push(rank.toString())
-    }
-  }
-
-  return rankCodes
-}
-
 
 function shuffle(array) {
   for (let i = array.length-1; i > 0; i--) {
@@ -194,7 +202,7 @@ function nextPlayerSeat(currentPlayerSeat, players) {
     return null
   }
 
-  if (players[PLAYER_COLOURS[index+1]]) {
+  if (players.get(PLAYER_COLOURS[index+1])) {
     return PLAYER_COLOURS[index+1]
   }
   else {

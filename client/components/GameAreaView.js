@@ -1,9 +1,14 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {phases} from '../constants'
+import {phases} from '../../common/constants'
+import {checkGroupValidity} from '../../common/validators'
 
 import StockPile from './StockPile'
 import DiscardPile from './DiscardPile'
+import GroupAdder from './GroupAdder'
+
+// Helper function
+const getCode = x => x.get('code')
 
 @connect(state => {
   return {
@@ -33,6 +38,7 @@ export default class GameAreaView extends Component {
             onClick={this._onClickDiscard}
             highlight={this.canDiscard()}
             />
+          { this.canAddGroup() && <GroupAdder canAdd={this.canAddGroup()} onClick={this._onAddGroup} /> }
         </div>
       )
     }
@@ -57,9 +63,23 @@ export default class GameAreaView extends Component {
     }
   }
 
+  _onAddGroup = () => {
+    if (this.canAddGroup()) {
+      this.props.onMeldNewGroup(this.getSelected().map(getCode).toJS())
+    }
+  }
+
+  canAddGroup = () => {
+    console.log('canAddGroup', this.isValidGroup(), this.props.phase, phases.BASE_TURN, this.props.isCurrent)
+    return this.isValidGroup() && this.props.phase == phases.BASE_TURN && this.props.isCurrent
+  }
+
   canDiscard = () => {
-    console.log(this.getSelected().toJS())
     return this.props.phase == phases.BASE_TURN && this.getSelected().size == 1
+  }
+
+  isValidGroup = () => {
+    return checkGroupValidity(this.getSelected().map(getCode).toJS()).valid
   }
 
   getSelected = () => {

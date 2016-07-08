@@ -43,6 +43,7 @@ const baseConfig = {
         include: [
           path.resolve(__dirname, '../server'),
           path.resolve(__dirname, '../client'),
+          path.resolve(__dirname, '../common'),
         ],
         query: {
           // https://github.com/babel/babel-loader#options

@@ -3,7 +3,7 @@ import {Map, fromJS} from 'immutable'
 import { model, index } from 'mongoose-decorators'
 import User from './user'
 import {startGame, stopGame} from '../rummy'
-import {phases} from '../../client/constants'
+import {phases} from '../../common/constants'
 
 const Player = (userId) => {
   return {
@@ -36,6 +36,7 @@ const Player = (userId) => {
     stock: [],
     discard: []
   } },
+  changes: [],
   players: { type: Object, default: {} },
   users: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
@@ -208,23 +209,25 @@ class Room {
 
   // FIXME: (Surely) ugly
   toState() {
-    let { cards, players, status, settings } = this
+    let { cards, players, status, settings, changes } = this
     let state = fromJS({
       cards: fromJS(Object(cards)),
       players: fromJS(players),
       status: fromJS(Object(status)),
-      settings: fromJS(Object(settings))
+      settings: fromJS(Object(settings)),
+      changes: fromJS(changes)
     })
     return state
   }
 
   // FIXME: Ugly.
   fromState(state) {
-    let { cards, players, status, settings } = state.toJS()
+    let { cards, players, status, settings, changes } = state.toJS()
     this.cards = cards
     this.players = players
     this.status = status
     this.settings = settings
+    this.changes = changes
   }
 
   saveState(state) {
