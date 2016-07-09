@@ -118,7 +118,7 @@ export function finishTurn(state, playerSeat, discarded) {
     .set('discardedCard', discarded)
 }
 
-function applyChanges(state) {
+export function applyChanges(state) {
   let changes = state.get('changes'),
     board = state.getIn(['cards', 'board']),
     players = state.get('players')

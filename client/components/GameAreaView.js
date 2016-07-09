@@ -6,6 +6,8 @@ import {checkGroupValidity} from '../../common/validators'
 import StockPile from './StockPile'
 import DiscardPile from './DiscardPile'
 import GroupAdder from './GroupAdder'
+import BoardGroup from './BoardGroup'
+import BoardCard from './BoardCard'
 
 // Helper function
 const getCode = x => x.get('code')
@@ -16,6 +18,7 @@ const getCode = x => x.get('code')
     phase: state.game.getIn(['status', 'phase']),
     stock: state.game.getIn(['cards', 'stock']),
     discard: state.game.getIn(['cards', 'discard']),
+    board: state.game.getIn(['cards', 'board']),
     hand: state.game.get('hand'),
     isCurrent: state.game.getIn(['status', 'currentPlayer']) === state.game.get('seat')
   }
@@ -38,6 +41,7 @@ export default class GameAreaView extends Component {
             onClick={this._onClickDiscard}
             highlight={this.canDiscard()}
             />
+          { this.renderGroups() }
           { this.canAddGroup() && <GroupAdder canAdd={this.canAddGroup()} onClick={this._onAddGroup} /> }
         </div>
       )
@@ -46,6 +50,14 @@ export default class GameAreaView extends Component {
       return <div className="gameAreaView"></div>
     }
 
+  }
+
+  renderGroups() {
+    let groups = this.props.board.map((group, index) => {
+      let cards = group.map(code => <BoardCard key={code} code={code} deck="classic" />).toJS()
+      return <BoardGroup key={index}>{cards}</BoardGroup>
+    })
+    return groups.toJS()
   }
 
   _onClickStock = () => {

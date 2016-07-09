@@ -250,12 +250,14 @@ function sockets(server) {
           }
         })
         .then((room) => {
+          let currentState = room.getCurrentState()
+          
           io.to(room.id).emit('game.drew_card', room.id, user.id, room.status)
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in room.players) {
-            let player = room.players[seat]
+          for (let seat in currentState.players) {
+            let player = currentState.players[seat]
             if (player.id === user.id) {
               socket.emit('game.hand', room.id, player.cards)
               break
@@ -279,12 +281,14 @@ function sockets(server) {
           }
         })
         .then((room) => {
+          let currentState = room.getCurrentState()
+
           io.to(room.id).emit('game.discarded', room.id, user.id, room.status, state.get('discardedCard'))
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in room.players) {
-            let player = room.players[seat]
+          for (let seat in currentState.players) {
+            let player = currentState.players[seat]
             if (player.id === user.id) {
               socket.emit('game.hand', room.id, player.cards)
               break
@@ -308,12 +312,14 @@ function sockets(server) {
           }
         })
         .then((room) => {
-          io.to(room.id).emit('game.melded_new', room.id, user.id, room.status, state.get('meldedCards'))
+          let currentState = room.getCurrentState()
+
+          io.to(room.id).emit('game.melded_new', room.id, user.id, currentState.status, state.get('meldedCards'))
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in room.players) {
-            let player = room.players[seat]
+          for (let seat in currentState.players) {
+            let player = currentState.players[seat]
             if (player.id === user.id) {
               socket.emit('game.hand', room.id, player.cards)
               break

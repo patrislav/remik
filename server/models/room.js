@@ -2,7 +2,7 @@
 import {Map, fromJS} from 'immutable'
 import { model, index } from 'mongoose-decorators'
 import User from './user'
-import {startGame, stopGame} from '../rummy'
+import {startGame, stopGame, applyChanges} from '../rummy'
 import {phases} from '../../common/constants'
 
 const Player = (userId) => {
@@ -182,11 +182,11 @@ class Room {
    * Returns a players object with the values being number of cards held by
    * each player
    */
-  getPlayersCardNums() {
-    let playerCardNums = {}
-    for (let i in this.players) {
-      if (this.players[i]) {
-        playerCardNums[i] = this.players[i].cards.length
+  getPlayersCardNums(state) {
+    let players = (state || this).players, playerCardNums = {}
+    for (let i in players) {
+      if (players[i]) {
+        playerCardNums[i] = players[i].cards.length
       }
       else {
         playerCardNums[i] = null
@@ -218,6 +218,10 @@ class Room {
       changes: fromJS(changes)
     })
     return state
+  }
+
+  getCurrentState() {
+    return applyChanges(this.toState()).toJS()
   }
 
   // FIXME: Ugly.

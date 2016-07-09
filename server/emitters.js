@@ -65,11 +65,12 @@ export default function (io, realm) {
     },
 
     gameCards: (target = io, room) => {
+      let state = room.getCurrentState()
       let data = {
-        board: room.cards.board,
-        stock: room.cards.stock.length,
+        board: state.cards.board,
+        stock: state.cards.stock.length,
         discard: room.getLastDiscard(),
-        players: room.getPlayersCardNums()
+        players: room.getPlayersCardNums(state)
       }
 
       target.emit('game.cards', room.id, data)

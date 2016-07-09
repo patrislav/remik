@@ -17,7 +17,7 @@ const initialState = Map({
   }),
 
   cards: Map({
-    board: [],
+    board: List(),
     discard: null,
     stock: 0,
     players: Map()
@@ -62,7 +62,7 @@ export default (state = initialState, action) => {
     }
 
     case actionTypes.game.CARDS:
-      return state.update('cards', c => c.merge(action.data))
+      return state.update('cards', c => c.mergeDeep(action.data))
 
     case actionTypes.game.DREW_CARD:
       return state.update('status', s => s.merge(action.status))
