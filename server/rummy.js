@@ -51,13 +51,14 @@ export function clearBoard(state) {
   return state.set('cards', fromJS(cards)).set('players', fromJS(players))
 }
 
-export function meld(state, playerSeat, cards) {
+export function meldNew(state, playerSeat, cards) {
   // TODO checks and mutations
   let change = {
-    type: 'meld',
+    type: 'meldNew',
     playerSeat, cards
   }
-  return state.update('changes', changes => changes.push(change))
+  return state.update('changes', changes => changes.push(fromJS(change)))
+    .set('meldedCards', cards)
 }
 
 // TODO: More checks!!!
@@ -123,11 +124,11 @@ function applyChanges(state) {
     players = state.get('players')
 
   changes.forEach(change => {
-    switch (change.type) {
-      case 'meld':
-        board = board.push(change.cards)
-        players = players.updateIn([change.playerSeat, 'cards'], cards =>
-          cards.filter(card => change.cards.indexOf(card) < 0)
+    switch (change.get('type')) {
+      case 'meldNew':
+        board = board.push(change.get('cards'))
+        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+          cards.filter(card => change.get('cards').indexOf(card) < 0)
         )
         break
     }

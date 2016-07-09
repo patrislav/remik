@@ -294,6 +294,35 @@ function sockets(server) {
         .catch(e => console.log('game.discard', e))
     })
 
+    socket.on('game.meld_new', (cards) => {
+      let state = {}
+      Room.findOne({ realm, users: user.id })
+        .then((room) => {
+          let seat = room.getSeatByUserId(user.id)
+          if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
+            state = rummy.meldNew(room.toState(), seat, cards)
+            return room.saveState(state)
+          }
+          else {
+            throw new Error("Not player's turn!")
+          }
+        })
+        .then((room) => {
+          io.to(room.id).emit('game.melded_new', room.id, user.id, room.status, state.get('meldedCards'))
+          emit.gameCards(io.to(room.id), room)
+
+          // TODO: Temporary!!!
+          for (let seat in room.players) {
+            let player = room.players[seat]
+            if (player.id === user.id) {
+              socket.emit('game.hand', room.id, player.cards)
+              break
+            }
+          }
+        })
+        .catch(e => console.log('game.meld_new', e))
+    })
+
     socket.on('game.leave', async () => {
       try {
         let stoppedGame = false
