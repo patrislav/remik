@@ -34,7 +34,11 @@ export default class HandCard extends Component {
   }
 
   getCode = () => {
-    return this.props.code.split('.')[0]
+    let code = this.props.code.split('.')[0]
+    if (code.charAt(0) === 'X') {
+      return 'X'
+    }
+    return code
   }
 
   _onClick = (event) => {

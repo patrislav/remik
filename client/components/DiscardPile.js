@@ -34,7 +34,11 @@ export default class DiscardPile extends Component {
   }
 
   getLastCardCode = () => {
-    return this.props.lastCard.split('.')[0]
+    let code = this.props.lastCard.split('.')[0]
+    if (code.charAt(0) === 'X') {
+      return 'X'
+    }
+    return code
   }
 
   _onClick = (event) => {
