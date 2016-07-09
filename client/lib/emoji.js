@@ -1,5 +1,6 @@
 
-import _ from 'lodash'
+import _escape from 'lodash/string/escape'
+import _escapeRegExp from 'lodash/string/escapeRegExp'
 import './emoji.scss'
 
 const _conversionTable = {
@@ -119,14 +120,14 @@ class Emoji {
         emoticon = emoticon.replace(_htmlEntities[entity], entity)
       }
       this.emoticons[emoticon] = _conversionTable[i].trim().replace(' ', '_')
-      a.push(_.escapeRegExp(emoticon))
+      a.push(_escapeRegExp(emoticon))
     }
 
     this.emoticonRegex = new RegExp(('(^|\\s)('+a.join('|')+')(?=$|[\\s|\\?\\.,!])'), 'g')
   }
 
   parse(str) {
-    return _.escape(str).replace(this.emoticonRegex, (m, $1, $2) => {
+    return _escape(str).replace(this.emoticonRegex, (m, $1, $2) => {
       let value = this.emoticons[$2]
       return value ? $1+this.htmlFor(value, m) : m
     })

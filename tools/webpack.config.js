@@ -3,7 +3,8 @@ import webpack from 'webpack'
 import extend from 'extend'
 import fs from 'fs'
 
-const NODE_ENV = process.env.NODE_ENV || 'development'
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+const NODE_ENV = process.env.NODE_ENV
 const VERBOSE = process.argv.includes('--verbose')
 const DEBUG = (NODE_ENV === 'development')
 const GLOBALS = {
@@ -28,6 +29,21 @@ fs.readdirSync('node_modules')
   .forEach(function(mod) {
     nodeModules[mod] = 'commonjs ' + mod
   })
+
+const plugins = [
+  new webpack.EnvironmentPlugin(['NODE_ENV'])
+]
+
+const clientPlugins = plugins.slice()
+if (!DEBUG) {
+  clientPlugins.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
+  )
+}
 
 //
 // Common configuration chunk to be used for both
@@ -138,13 +154,7 @@ export const clientConfig = extend(true, {}, baseConfig, {
     filename: 'application.js'
   },
 
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
-  ],
+  plugins: clientPlugins,
   resolve: {
     root: path.resolve(__dirname, '../client'),
     modulesDirectories: ['node_modules'],
@@ -159,6 +169,7 @@ export const serverConfig = extend(true, {}, baseConfig, {
     path: path.resolve(__dirname, '../build', NODE_ENV),
     filename: 'server.js'
   },
+  plugins,
   target: 'node',
   externals: nodeModules,
   node: {

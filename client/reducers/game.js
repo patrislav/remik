@@ -31,8 +31,6 @@ const initialState = Map({
  * Default reducer
  */
 export default (state = initialState, action) => {
-  console.log(action)
-
   switch (action.type) {
     case actionTypes.SWITCH_SCREEN:
       return state.set('screen', action.screen)
