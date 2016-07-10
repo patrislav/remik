@@ -31,15 +31,15 @@ export function checkGroupValidity(cards) {
 
   // If there is an ace
   let aceIndex = ranksWithoutJokers.indexOf(1)
-  if (aceIndex && acePosition === 'both') {
-    if (ranks.indexOf(13) || (jokerCount > 0 && ranks.indexOf(12))) {
+  if (aceIndex >= 0 && acePosition === 'both') {
+    if (ranks.indexOf(13) >= 0 || (jokerCount > 0 && ranks.indexOf(12) >= 0)) {
       ranksWithoutJokers[aceIndex] = 14
     }
-    else if (!ranks.indexOf(2) && !(jokerCount > 0 && ranks.indexOf(3))) {
+    else if (ranks.indexOf(2) < 0 && !(jokerCount > 0 && ranks.indexOf(3) >= 0)) {
       return { valid: false, reason: 'TODO' }
     }
   }
-  else if (aceIndex && acePosition === 'high') {
+  else if (aceIndex >= 0 && acePosition === 'high') {
     ranksWithoutJokers[aceIndex] = 14
   }
 
@@ -54,11 +54,18 @@ export function checkGroupValidity(cards) {
 
 
 function getRank(card) {
-  return parseCardCode(card.split('.')[0]).rank
+  let code = card.charAt(0)
+  if (code === 'X') {
+    return 'X'
+  }
+  return (code in RANK_SYMBOLS ? RANK_SYMBOLS[code] : parseInt(code))
 }
 
 function getSuit(card) {
-  return parseCardCode(card.split('.')[0]).suit
+  if (card.charAt(0) === 'X') {
+    return 'X'
+  }
+  return SUIT_SYMBOLS.indexOf(card.charAt(1))
 }
 
 function parseCardCode(code) {
@@ -66,7 +73,7 @@ function parseCardCode(code) {
     return { joker: 1, suit: 'X', rank: 'X' }
   }
 
-  const regex = new RegExp(`(${RANK_CODES.join('|')}){1,2}(${SUIT_SYMBOLS.join('|')})`, 'g')
+  const regex = new RegExp(`(${RANK_CODES.join('|')})(${SUIT_SYMBOLS.join('|')})`, 'g')
 
   const match = regex.exec(code)
 
@@ -91,8 +98,9 @@ function unique(array) {
   })
 }
 
-function isConsecutive(array, jokerCount) {
-  array.sort()
+function isConsecutive(array, jokerCount = 0) {
+  // Sort the array numerically in ascending order
+  array.sort((a, b) => a - b)
 
   for (let i = 0; i < array.length-1; i++) {
     if (array[i+1] !== array[i]+1) {
