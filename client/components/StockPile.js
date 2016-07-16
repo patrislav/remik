@@ -13,7 +13,7 @@ export default class StockPile extends Component {
 
   render() {
     let className = `playing-card playing-card-back-${this.props.back} deck-${this.props.deck}`,
-      wrapperClassName = "entity table-card-wrapper"
+      wrapperClassName = "entity pile-card-wrapper"
 
     if (this.props.highlight) {
       wrapperClassName += " pile-highlight"

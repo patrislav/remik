@@ -1,5 +1,37 @@
 :global {
-  .entity.table-card-wrapper {
+  ul.boardGroup {
+    position: relative;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5em 1em;
+    clear: both;
+    height: 86px;
+
+    & > li {
+      position: absolute;
+    }
+
+    @for $x from 1 through 26 {
+      & > li:nth-child(#{$x}) { left: ($x - 1)*17px; }
+    }
+
+    &.group-highlight {
+      box-shadow: 0px 0px 15px 2px rgba(29,29,135,0.75);
+      cursor: pointer;
+    }
+  }
+
+  .table-card-wrapper {
+    width: 62px;
+    height: 86px;
+
+    & > .playing-card {
+      width: 62px;
+      height: 86px;
+    }
+  }
+
+  .pile-card-wrapper {
     width: 62px;
     height: 86px;
     position: relative;

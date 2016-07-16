@@ -14,7 +14,7 @@ export default class DiscardPile extends Component {
   render() {
     if (this.props.lastCard) {
       let className = `playing-card playing-card-${this.getLastCardCode()} deck-${this.props.deck}`,
-        wrapperClassName = "entity table-card-wrapper"
+        wrapperClassName = "entity pile-card-wrapper"
 
       if (this.props.highlight) {
         wrapperClassName += " pile-highlight"

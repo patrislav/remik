@@ -1,5 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 
+import '../styles/cards.scss'
+
 export default class BoardCard extends Component {
   static propTypes = {
     code: PropTypes.string.isRequired,
@@ -11,11 +13,11 @@ export default class BoardCard extends Component {
     let wrapperClassName = "entity table-card-wrapper"
 
     return (
-      <div
+      <li
         className={wrapperClassName}
         >
         <div className={className} />
-      </div>
+      </li>
     )
   }
 
