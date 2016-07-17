@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import {checkGroupValidity} from '../validators'
+import {checkGroupValidity, orderGroup} from '../cards'
 
 describe('checkGroupValidity()', () => {
   const validGroups = [
@@ -54,6 +54,28 @@ describe('checkGroupValidity()', () => {
   invalidGroups.concat(invalidJokerGroups).forEach(group => {
     it(`${JSON.stringify(group)} is invalid`, () => {
       expect(checkGroupValidity(group).valid).to.be.false
+    })
+  })
+})
+
+describe('orderGroup()', () => {
+  const orderedGroups = [
+    // Order even non-consecutive groups
+    [ '7s.0 5s.1 2s.0', '2s.0 5s.1 7s.0' ],
+    [ 'Kh.0 Dh.0 Ah.0 Qh.0', 'Dh.0 Qh.0 Kh.0 Ah.0' ],
+    // Order ace correctly
+    [ '3s.0 2s.0 As.0', 'As.0 2s.0 3s.0'],
+    [ 'Qc.0 Ac.0 Kc.0', 'Qc.0 Kc.0 Ac.0']
+  ]
+
+  const orderedJokerGroups = [
+    [ 'X1.0 8s.0 6s.0', '6s.0 X1.0 8s.0' ],
+    [ '4h.0 X1.0 5h.0', '4h.0 5h.0 X1.0' ]
+  ]
+
+  orderedGroups.concat(orderedJokerGroups).forEach(example => {
+    it(`${example[0]} is ordered correctly`, () => {
+      expect(orderGroup(example[0].split(' '))).to.eql(example[1].split(' '))
     })
   })
 })

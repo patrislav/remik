@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {phases} from '../../common/constants'
-import {checkGroupValidity} from '../../common/validators'
+import {checkGroupValidity} from '../../common/cards'
 
 import StockPile from './StockPile'
 import DiscardPile from './DiscardPile'

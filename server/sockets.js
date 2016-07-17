@@ -251,7 +251,7 @@ function sockets(server) {
         })
         .then((room) => {
           let currentState = room.getCurrentState()
-          
+
           io.to(room.id).emit('game.drew_card', room.id, user.id, room.status)
           emit.gameCards(io.to(room.id), room)
 
@@ -354,6 +354,48 @@ function sockets(server) {
         console.log('game.leave', e)
       }
     })
+
+    // // TODO: ONLY DEV THING
+    // socket.on('devtest', async () => {
+    //   const otherUserId = '101180776948192'
+    //   const otherUser = await User.findOne({ realm, id: otherUserId })
+    //   if (!otherUser) {
+    //     throw new Error(`Cannot retrieve user with id ${otherUserId}`)
+    //   }
+    //   const otherSocket = io.sockets.connected[otherUser.socketId]
+    //
+    //   const players = { red: null, blue: null }
+    //   const room = new Room({ realm, players })
+    //   room.addUser(user.id)
+    //   room.addUser(otherUser.id)
+    //
+    //   room.save()
+    //     .then(room => {
+    //       socket.join(room.id)
+    //       socket.emit('room.joined', room.id)
+    //       socket.broadcast.to(room.id).emit('room.user_joined', room.id, user)
+    //
+    //       emit.roomUsers(socket, room)
+    //       emit.roomSettings(socket, room)
+    //
+    //       if (otherSocket) {
+    //         otherSocket.join(room.id)
+    //         otherSocket.emit('room.joined', room.id)
+    //         otherSocket.broadcast.to(room.id).emit('room.user_joined', room.id, user)
+    //
+    //         emit.roomUsers(otherSocket, room)
+    //         emit.roomSettings(otherSocket, room)
+    //       }
+    //
+    //       room.addPlayer('red', user.id)
+    //       room.addPlayer('blue', otherUser.id)
+    //       room.startGame()
+    //       return room.save()
+    //     })
+    //     .then(room => {
+    //
+    //     })
+    // })
 
   })
 

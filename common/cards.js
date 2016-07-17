@@ -52,6 +52,62 @@ export function checkGroupValidity(cards) {
   return { valid: false, reason: 'TODO' }
 }
 
+export function orderGroup(group) {
+  const aces = group.filter(c => getRank(c) === 1)
+  const jokers = group.filter(c => getRank(c) === 'X')
+  group = group
+    .filter(c => getRank(c) !== 1 )
+    .filter(c => getRank(c) !== 'X')
+    .sort((a, b) => {
+      const [ rankA, rankB, suitA, suitB ] = [ getRank(a), getRank(b), getSuit(a), getSuit(b) ]
+
+      // First sort by suits
+      if (suitA !== suitB) {
+        return suitA - suitB
+      }
+
+      // Then by ranks
+      return rankA - rankB
+    })
+
+  // Insert aces
+  aces.forEach(ace => {
+    // If group has a King, put an ace in the end
+    if (group.find(code => getRank(code) === 13)) {
+      group.push(ace)
+    }
+    // If group has a 2, put an ace in the beginning
+    else if (group.find(code => getRank(code) === 2)) {
+      group.unshift(ace)
+    }
+    // Otherwise, push it somewhere in the end
+    else {
+      group.push(ace)
+    }
+  })
+
+  // Insert jokers
+  jokers.forEach(joker => {
+    // Find a gap
+    for (let i = 0; i < group.length-1; i++) {
+      if (getRank(group[i+1]) - getRank(group[i]) > 1) {
+        group.splice(i+1, 0, joker)
+        return
+      }
+    }
+
+    // If no gaps found, shove it in the end, unless the last card is an ace
+    if (getRank(group[group.length-1]) === 1 && getRank(group[group.length-2]) !== 1) {
+      group.unshift(joker)
+    }
+    else {
+      group.push(joker)
+    }
+  })
+
+  return group
+}
+
 
 function getRank(card) {
   let code = card.charAt(0)

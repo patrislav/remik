@@ -1,5 +1,5 @@
 import {fromJS} from 'immutable'
-// TODO: Move this file into common directory
+import {checkGroupValidity, orderGroup} from '../common/cards'
 import {
   phases,
   INITIAL_CARDS,
@@ -52,7 +52,13 @@ export function clearBoard(state) {
 }
 
 export function meldNew(state, playerSeat, cards) {
-  // TODO checks and mutations
+  const check = checkGroupValidity(cards)
+  if (!check.valid) {
+    throw new Error('meldNew', check.reason)
+  }
+
+  cards = orderGroup(cards)
+
   let change = {
     type: 'meldNew',
     playerSeat, cards
