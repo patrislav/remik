@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import s from './styles.scss'
 
 export default class GroupAdder extends Component {
   /**
@@ -15,8 +16,9 @@ export default class GroupAdder extends Component {
 
   render() {
     return (
-      <button className="groupAdder" onClick={this._onClick} style={{ height: '60px' }}>
-        Meld!
+      <button className={s.groupAdder} onClick={this._onClick}>
+        <span className={s.plus}>+</span>
+        <span className={s.subtext}>Meld</span>
       </button>
     )
   }
