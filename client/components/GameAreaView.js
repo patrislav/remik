@@ -54,8 +54,15 @@ export default class GameAreaView extends Component {
 
   renderGroups() {
     let groups = this.props.board.map((group, index) => {
-      let cards = group.map(code => <BoardCard key={code} code={code} deck="classic" />).toJS()
-      return <BoardGroup key={index}>{cards}</BoardGroup>
+      group = group.toJS()
+      let cards = group.map(code => <BoardCard key={code} code={code} deck="classic" />)
+      return <BoardGroup
+          key={index}
+          canClick={this.canClickGroup(group)}
+          onClick={() => this._onClickGroup(group)}
+        >
+          {cards}
+        </BoardGroup>
     })
     return groups.toJS()
   }
@@ -75,9 +82,15 @@ export default class GameAreaView extends Component {
     }
   }
 
+  _onClickGroup = (group) => {
+    if (this.canClickGroup(group)) {
+      this.props.onMeldExisting(group, this.getSelectedCodes())
+    }
+  }
+
   _onAddGroup = () => {
     if (this.canAddGroup()) {
-      this.props.onMeldNewGroup(this.getSelected().map(getCode).toJS())
+      this.props.onMeldNewGroup(this.getSelectedCodes())
     }
   }
 
@@ -85,16 +98,24 @@ export default class GameAreaView extends Component {
     return this.isValidGroup() && this.props.phase == phases.BASE_TURN && this.props.isCurrent
   }
 
+  canClickGroup = (group) => {
+    return this.getSelected().size > 0 && checkGroupValidity(this.getSelectedCodes().concat(group)).valid
+  }
+
   canDiscard = () => {
     return this.props.phase == phases.BASE_TURN && this.getSelected().size == 1
   }
 
   isValidGroup = () => {
-    return checkGroupValidity(this.getSelected().map(getCode).toJS()).valid
+    return checkGroupValidity(this.getSelectedCodes()).valid
   }
 
   getSelected = () => {
     return this.props.hand.filter(card => card.get('selected'))
+  }
+
+  getSelectedCodes = () => {
+    return this.getSelected().map(getCode).toJS()
   }
 
 }

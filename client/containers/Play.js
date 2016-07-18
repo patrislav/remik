@@ -66,6 +66,7 @@ export default class Play extends Component {
             onDiscard={this._onDiscard}
             onSelectHandCard={this._onSelectHandCard}
             onMeldNewGroup={this._onMeldNewGroup}
+            onMeldExisting={this._onMeldExisting}
             />
         </main>
       </div>
@@ -116,5 +117,9 @@ export default class Play extends Component {
 
   _onMeldNewGroup = (cards) => {
     io.socket.emit('game.meld_new', cards)
+  }
+
+  _onMeldExisting = (group, cards) => {
+    io.socket.emit('game.meld_existing', group, cards)
   }
 }

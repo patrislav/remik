@@ -8,10 +8,22 @@ export default class BoardGroup extends Component {
     const numChildren = this.props.children.length
     const width = (numChildren ? 62 + (numChildren-1)*17 : 0)
 
+    let className = "boardGroup"
+    if (this.props.canClick) {
+      className += " group-highlight"
+    }
+
     return (
-      <ul className="boardGroup" style={{ width: width + 'px' }}>
+      <ul className={className} style={{ width: width + 'px' }} onClick={this._onClick}>
         {this.props.children}
       </ul>
     )
+  }
+
+  _onClick = (event) => {
+    if (this.props.onClick && this.props.canClick) {
+      this.props.onClick()
+    }
+    event.preventDefault()
   }
 }
