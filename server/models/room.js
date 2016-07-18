@@ -19,7 +19,8 @@ const Player = (userId) => {
   realm: { type: String },
   settings: { type: Object, default: {
     maxPlayers: 2,
-    jokersPerDeck: 1,
+    // FIXME: Jokers break everything, turn off for now
+    jokersPerDeck: 0,
     deckCount: 2,
     deckBack: 'classic',
     deckFront: 'classic',
