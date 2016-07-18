@@ -67,6 +67,25 @@ export function meldNew(state, playerSeat, cards) {
     .set('meldedCards', cards)
 }
 
+export function meldExisting(state, playerSeat, group, cards) {
+  if (findGroupIndex(state, group) < 0) {
+    throw new Error('meldExisting no such group found: ' + group)
+  }
+
+  const check = checkGroupValidity(group.concat(cards))
+  if (!check.valid) {
+    throw new Error('meldExisting invalid ' + JSON.stringify(group.concat(cards)) + JSON.stringify(check))
+  }
+
+  // const result = orderGroup(group.concat(cards))
+
+  let change = {
+    type: 'meldExisting',
+    playerSeat, group, cards
+  }
+  return state.update('changes', changes => changes.push(fromJS(change)))
+}
+
 // TODO: More checks!!!
 // FIXME: Maybe use the Immutables themselves instead of converting using toJS?
 export function drawCard(state, playerSeat, pileName) {
@@ -137,6 +156,19 @@ export function applyChanges(state) {
           cards.filter(card => change.get('cards').indexOf(card) < 0)
         )
         break
+
+      case 'meldExisting': {
+        const index = findGroupIndex(state, change.get('group').toJS())
+        if (index >= 0) {
+          board = board.update(index, group =>
+            orderGroup(group.concat(change.get('cards').toJS()))
+          )
+          players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+            cards.filter(card => change.get('cards').indexOf(card) < 0)
+          )
+        }
+        break
+      }
     }
   })
 
@@ -147,8 +179,12 @@ export function applyChanges(state) {
     .set('players', players)
 }
 
-function rollbackChanges(state) {
+export function rollbackChanges(state) {
   return state.update('changes', changes => changes.clear())
+}
+
+export function findGroupIndex(state, group) {
+  return state.getIn(['cards', 'board']).findIndex(g => g.toJS().sort().toString() === group.sort().toString())
 }
 
 // FIXME: Maybe use the Immutables themselves instead of converting using toJS?
