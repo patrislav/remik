@@ -8,6 +8,16 @@ import * as rummy from './rummy'
 // TODO: Move this file into common directory
 import {phases} from '../common/constants'
 
+function dumpError(error) {
+  if (error.message) {
+    console.error(error.message)
+  }
+  if (error.stack) {
+    console.error("\nStacktrace\n====================")
+    console.error(error.stack)
+  }
+}
+
 function sockets(server) {
   const io = socketIO(server)
 
@@ -23,13 +33,13 @@ function sockets(server) {
       }
     }
     catch (error) {
-      console.log('connect', 'no user')
+      dumpError(error)
       socket.emit('exception', 'connect', 'no user')
       socket.disconnect()
     }
 
     if (user.socketId in io.sockets.connected) {
-      console.log('connect', 'already connected')
+      console.error('already connected')
       socket.emit('exception', 'connect', 'already connected')
       socket.disconnect()
     }
@@ -39,7 +49,7 @@ function sockets(server) {
       await user.save()
     }
     catch (error) {
-      console.log('connect', 'cannot save user')
+      dumpError(error)
       socket.emit('exception', 'connect', 'cannot save user')
       socket.disconnect()
     }
@@ -106,7 +116,7 @@ function sockets(server) {
           })
       }
       catch(e) {
-        console.log('room.join', e)
+        dumpError(e)
       }
     })
 
@@ -127,7 +137,7 @@ function sockets(server) {
           return room.save()
         })
         .catch((err) => {
-          console.log(err)
+          dumpError(err)
         })
         .then((room) => {
           socket.broadcast.to(room.id).emit('room.user_left', room.id, user)
@@ -187,7 +197,7 @@ function sockets(server) {
         io.to(room.id).emit('chat.message', user.id, message)
       }
       catch(e) {
-        console.log('chat.message', e)
+        dumpError(e)
       }
     })
 
@@ -202,7 +212,7 @@ function sockets(server) {
         socket.broadcast.to(room.id).emit('chat.typing', user.id)
       }
       catch(e) {
-        console.log('chat.typing', e)
+        dumpError(e)
       }
     })
 
@@ -225,10 +235,10 @@ function sockets(server) {
               emit.gameStart(io.to(room.id), room)
             }
           })
-          .catch(e => console.log('game.join', e))
+          .catch(e => dumpError(e))
       }
       catch(e) {
-        console.log('game.join', e)
+        dumpError(e)
       }
     })
 
@@ -264,7 +274,7 @@ function sockets(server) {
             }
           }
         })
-        .catch(e => console.log('game.draw_card', e))
+        .catch(e => dumpError(e))
     })
 
     socket.on('game.discard', (code) => {
@@ -295,7 +305,7 @@ function sockets(server) {
             }
           }
         })
-        .catch(e => console.log('game.discard', e))
+        .catch(e => dumpError(e))
     })
 
     socket.on('game.meld_new', (cards) => {
@@ -326,7 +336,38 @@ function sockets(server) {
             }
           }
         })
-        .catch(e => console.log('game.meld_new', e))
+        .catch(e => dumpError(e))
+    })
+
+    socket.on('game.meld_existing', (group, cards) => {
+      let state = {}
+      Room.findOne({ realm, users: user.id })
+        .then(room => {
+          let seat = room.getSeatByUserId(user.id)
+          if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
+            state = rummy.meldExisting(room.toState(), seat, group, cards)
+            return room.saveState(state)
+          }
+          else {
+            throw new Error("Not player's turn!")
+          }
+        })
+        .then(room => {
+          let currentState = room.getCurrentState()
+
+          io.to(room.id).emit('game.melded_existing', room.id, user.id, currentState.status)
+          emit.gameCards(io.to(room.id), room)
+
+          // TODO: Temporary!!!
+          for (let seat in currentState.players) {
+            let player = currentState.players[seat]
+            if (player.id === user.id) {
+              socket.emit('game.hand', room.id, player.cards)
+              break
+            }
+          }
+        })
+        .catch(e => dumpError(e))
     })
 
     socket.on('game.leave', async () => {
@@ -351,7 +392,7 @@ function sockets(server) {
           })
       }
       catch(e) {
-        console.log('game.leave', e)
+        dumpError(e)
       }
     })
 
