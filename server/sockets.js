@@ -266,12 +266,9 @@ function sockets(server) {
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in currentState.players) {
-            let player = currentState.players[seat]
-            if (player.id === user.id) {
-              socket.emit('game.hand', room.id, player.cards)
-              break
-            }
+          const player = currentState.get('players').find(player => player.get('id') === user.id)
+          if (player) {
+            socket.emit('game.hand', room.id, player.get('cards').toJS())
           }
         })
         .catch(e => dumpError(e))
@@ -297,12 +294,9 @@ function sockets(server) {
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in currentState.players) {
-            let player = currentState.players[seat]
-            if (player.id === user.id) {
-              socket.emit('game.hand', room.id, player.cards)
-              break
-            }
+          const player = currentState.get('players').find(player => player.get('id') === user.id)
+          if (player) {
+            socket.emit('game.hand', room.id, player.get('cards').toJS())
           }
         })
         .catch(e => dumpError(e))
@@ -328,12 +322,9 @@ function sockets(server) {
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in currentState.players) {
-            let player = currentState.players[seat]
-            if (player.id === user.id) {
-              socket.emit('game.hand', room.id, player.cards)
-              break
-            }
+          const player = currentState.get('players').find(player => player.get('id') === user.id)
+          if (player) {
+            socket.emit('game.hand', room.id, player.get('cards').toJS())
           }
         })
         .catch(e => dumpError(e))
@@ -359,12 +350,9 @@ function sockets(server) {
           emit.gameCards(io.to(room.id), room)
 
           // TODO: Temporary!!!
-          for (let seat in currentState.players) {
-            let player = currentState.players[seat]
-            if (player.id === user.id) {
-              socket.emit('game.hand', room.id, player.cards)
-              break
-            }
+          const player = currentState.get('players').find(player => player.get('id') === user.id)
+          if (player) {
+            socket.emit('game.hand', room.id, player.get('cards').toJS())
           }
         })
         .catch(e => dumpError(e))

@@ -222,7 +222,7 @@ class Room {
   }
 
   getCurrentState() {
-    return applyChanges(this.toState()).toJS()
+    return applyChanges(this.toState())
   }
 
   // FIXME: Ugly.
