@@ -123,7 +123,7 @@ export function drawCard(state, playerSeat, pileName) {
 
 export function takeJoker(state, playerSeat, group) {
   if (findGroupIndex(state, group) < 0) {
-    throw new Error('meldExisting no such group found: ' + group)
+    throw new Error('takeJoker no such group found: ' + group)
   }
 
   if (takeableJokerPosition(group) < 0) {

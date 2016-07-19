@@ -110,7 +110,7 @@ export function orderGroup(group) {
 }
 
 export function takeableJokerPosition(cards) {
-  if (cards.length < 3) {
+  if (cards.length < 4) {
     return -1
   }
 

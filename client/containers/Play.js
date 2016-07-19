@@ -67,6 +67,7 @@ export default class Play extends Component {
             onSelectHandCard={this._onSelectHandCard}
             onMeldNewGroup={this._onMeldNewGroup}
             onMeldExisting={this._onMeldExisting}
+            onTakeJoker={this._onTakeJoker}
             />
         </main>
       </div>
@@ -121,5 +122,9 @@ export default class Play extends Component {
 
   _onMeldExisting = (group, cards) => {
     io.socket.emit('game.meld_existing', group, cards)
+  }
+
+  _onTakeJoker = (group) => {
+    io.socket.emit('game.take_joker', group)
   }
 }

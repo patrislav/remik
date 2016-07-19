@@ -60,7 +60,7 @@ export default (state = initialState, action) => {
     }
 
     case actionTypes.game.CARDS:
-      return state.update('cards', c => c.mergeDeep(action.data))
+      return state.set('cards', fromJS(action.data))
 
     case actionTypes.game.DREW_CARD:
       return state.update('status', s => s.merge(action.status))

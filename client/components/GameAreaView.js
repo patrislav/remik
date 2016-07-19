@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {phases} from '../../common/constants'
-import {checkGroupValidity} from '../../common/cards'
+import {checkGroupValidity, takeableJokerPosition} from '../../common/cards'
 
 import StockPile from './StockPile'
 import DiscardPile from './DiscardPile'
@@ -58,7 +58,7 @@ export default class GameAreaView extends Component {
       let cards = group.map(code => <BoardCard key={code} code={code} deck="classic" />)
       return <BoardGroup
           key={index}
-          canClick={this.canClickGroup(group)}
+          canClick={this.canMeldExisting(group) || this.canTakeJoker(group)}
           onClick={() => this._onClickGroup(group)}
         >
           {cards}
@@ -83,8 +83,12 @@ export default class GameAreaView extends Component {
   }
 
   _onClickGroup = (group) => {
-    if (this.canClickGroup(group)) {
+    if (this.canMeldExisting(group)) {
       this.props.onMeldExisting(group, this.getSelectedCodes())
+    }
+
+    if (this.canTakeJoker(group)) {
+      this.props.onTakeJoker(group)
     }
   }
 
@@ -95,15 +99,25 @@ export default class GameAreaView extends Component {
   }
 
   canAddGroup = () => {
-    return this.isValidGroup() && this.props.phase == phases.BASE_TURN && this.props.isCurrent
+    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+      && this.isValidGroup()
   }
 
-  canClickGroup = (group) => {
-    return this.getSelected().size > 0 && checkGroupValidity(this.getSelectedCodes().concat(group)).valid
+  canMeldExisting = (group) => {
+    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+      && this.getSelected().size > 0
+      && checkGroupValidity(this.getSelectedCodes().concat(group)).valid
+  }
+
+  canTakeJoker = (group) => {
+    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+      && this.getSelected().size === 0
+      && takeableJokerPosition(group) > -1
   }
 
   canDiscard = () => {
-    return this.props.phase == phases.BASE_TURN && this.getSelected().size == 1
+    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+      && this.getSelected().size == 1
   }
 
   isValidGroup = () => {
