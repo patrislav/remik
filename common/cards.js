@@ -109,6 +109,22 @@ export function orderGroup(group) {
   return group
 }
 
+export function takeableJokerPosition(cards) {
+  if (cards.length < 3) {
+    return -1
+  }
+
+  if (getRank(cards[0]) === 'X') {
+    return 0
+  }
+
+  if (getRank(cards[cards.length-1]) === 'X') {
+    return cards.length-1
+  }
+
+  return -1
+}
+
 
 function getRank(card) {
   let code = card.charAt(0)

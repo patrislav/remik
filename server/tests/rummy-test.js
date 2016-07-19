@@ -121,6 +121,68 @@ describe('rummy', () => {
     // TODO: Add tests!
   })
 
+  describe('takeJoker()', () => {
+    const seat = 'red'
+
+    describe('when the group is not on board', () => {
+      const group = ['X0.0', '7d.0', '8d.0', '9d.0']
+      const state = fromJS({
+        cards: {
+          board: [
+            ['X0.0', '7d.0', '8d.1', '9d.0'] // Slightly different
+          ]
+        }
+      })
+
+      it('throws an error', () => {
+        const fn = () => rummy.takeJoker(state, seat, group)
+        expect(fn).to.throw(/no such group/)
+      })
+    })
+
+    describe('when the resulting group would be invalid', () => {
+      const group = ['7d.0', 'X0.0', '9d.0'] // joker is needed
+      const state = fromJS({
+        cards: {
+          board: [
+            group
+          ]
+        }
+      })
+
+      it('throws an error', () => {
+        const fn = () => rummy.takeJoker(state, seat, group)
+        expect(fn).to.throw(/invalid/)
+      })
+    })
+
+    describe('when everything is ok', () => {
+      const group = ['X0.0', '7d.0', '8d.0', '9d.0']
+      const state = fromJS({
+        cards: {
+          board: [
+            group
+          ]
+        },
+        changes: []
+      })
+
+      const expectedChange = fromJS({
+        type: 'takeJoker',
+        playerSeat: seat,
+        group
+      })
+
+      it('adds the change to changes list', () => {
+        expect(rummy.takeJoker(state, seat, group))
+          .to.have.property('changes')
+          .that.is.an.instanceof(List)
+          .with.deep.property([0])
+          .that.equals(expectedChange)
+      })
+    })
+  })
+
   describe('finishTurn()', () => {
     // TODO: Add tests!
   })
@@ -183,6 +245,53 @@ describe('rummy', () => {
         .to.have.property('changes')
         .that.is.empty
     })
+
+    describe('takeJoker', () => {
+      const seat = 'red'
+      const group = ['X0.0', '7d.0', '8d.0', '9d.0']
+      const cards = ['Dd.0', '6d.1']
+      const initialState = fromJS({
+        cards: {
+          board: [group]
+        },
+        players: {
+          [seat]: {
+            cards
+          }
+        },
+        changes: []
+      })
+
+      let state
+
+      beforeEach(() => {
+        state = rummy.takeJoker(initialState, seat, group)
+      })
+
+      it('adds the change to changes list', () => {
+        expect(state)
+          .to.have.property('changes')
+          .that.is.an.instanceof(List)
+          .with.deep.property([0, 'type'])
+          .that.equals('takeJoker')
+      })
+
+      it('updates the group on the board', () => {
+        const resultGroup = fromJS(['7d.0', '8d.0', '9d.0']) // without the joker
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['cards', 'board'])
+          .that.is.an.instanceof(List)
+          .with.deep.property([0])
+          .that.equals(resultGroup)
+      })
+
+      it("adds the joker to player's hand", () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['players', seat, 'cards'])
+          .that.is.an.instanceof(List)
+          .and.includes('X0.0')
+      })
+    })
   })
 
   describe('rollbackChanges()', () => {
@@ -216,6 +325,12 @@ describe('rummy', () => {
     it('returns -1 when not found', () => {
       const group = ['3c.0', '4c.0', '5c.1'] // just slightly different!
       expect(rummy.findGroupIndex(state, group)).to.be.equal(-1)
+    })
+
+    it("doesn't mutate the passed array", () => {
+      let group = ['7d.0', 'X0.0', '9d.0']
+      rummy.findGroupIndex(state, group)
+      expect(group).to.eql(['7d.0', 'X0.0', '9d.0'])
     })
   })
 })

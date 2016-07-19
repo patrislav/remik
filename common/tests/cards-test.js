@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import {checkGroupValidity, orderGroup} from '../cards'
+import {checkGroupValidity, orderGroup, takeableJokerPosition} from '../cards'
 
 describe('checkGroupValidity()', () => {
   const validGroups = [
@@ -80,6 +80,20 @@ describe('orderGroup()', () => {
   orderedGroups.concat(orderedJokerGroups).forEach(example => {
     it(`${example[0]} is ordered correctly`, () => {
       expect(orderGroup(example[0].split(' '))).to.eql(example[1].split(' '))
+    })
+  })
+})
+
+describe('takeableJokerPosition()', () => {
+  const groups = [
+    [ '6s.0 X1.0 8s.0', -1 ],
+    [ 'X0.0 Qd.0 Kd.1 Ad.0', 0 ],
+    [ 'Jd.0 Qd.0 Kd.1 X0.0', 3 ]
+  ]
+
+  groups.forEach(example => {
+    it(`${example[0]} gives correct joker position`, () => {
+      expect(takeableJokerPosition(example[0].split(' '))).to.be.equal(example[1])
     })
   })
 })

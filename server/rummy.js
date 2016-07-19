@@ -1,5 +1,5 @@
 import {fromJS} from 'immutable'
-import {checkGroupValidity, orderGroup} from '../common/cards'
+import {checkGroupValidity, orderGroup, takeableJokerPosition} from '../common/cards'
 import {
   phases,
   INITIAL_CARDS,
@@ -79,7 +79,7 @@ export function meldExisting(state, playerSeat, group, cards) {
 
   // const result = orderGroup(group.concat(cards))
 
-  let change = {
+  const change = {
     type: 'meldExisting',
     playerSeat, group, cards
   }
@@ -119,6 +119,22 @@ export function drawCard(state, playerSeat, pileName) {
     .setIn(['players', playerSeat], fromJS(player))
     .setIn(['status', 'phase'], phases.BASE_TURN)
     .set('drewCard', drewCard)
+}
+
+export function takeJoker(state, playerSeat, group) {
+  if (findGroupIndex(state, group) < 0) {
+    throw new Error('meldExisting no such group found: ' + group)
+  }
+
+  if (takeableJokerPosition(group) < 0) {
+    throw new Error('takeJoker invalid ' + JSON.stringify(group))
+  }
+
+  const change = {
+    type: 'takeJoker',
+    playerSeat, group
+  }
+  return state.update('changes', changes => changes.push(fromJS(change)))
 }
 
 export function finishTurn(state, playerSeat, discarded) {
@@ -169,6 +185,19 @@ export function applyChanges(state) {
         }
         break
       }
+
+      case 'takeJoker': {
+        const index = findGroupIndex(state, change.get('group').toJS())
+        if (index >= 0) {
+          const position = takeableJokerPosition(board.get(index).toJS())
+          const joker = board.getIn([index, position])
+          board = board.update(index, group => group.delete(position))
+          players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+            cards.push(joker)
+          )
+        }
+        break
+      }
     }
   })
 
@@ -184,6 +213,7 @@ export function rollbackChanges(state) {
 }
 
 export function findGroupIndex(state, group) {
+  group = group.slice() // don't mutate the array!
   return state.getIn(['cards', 'board']).findIndex(g => g.toJS().sort().toString() === group.sort().toString())
 }
 
