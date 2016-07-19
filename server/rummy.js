@@ -161,7 +161,7 @@ export function applyChanges(state) {
         const index = findGroupIndex(state, change.get('group').toJS())
         if (index >= 0) {
           board = board.update(index, group =>
-            orderGroup(group.concat(change.get('cards').toJS()))
+            fromJS(orderGroup(group.concat(change.get('cards')).toJS()))
           )
           players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
             cards.filter(card => change.get('cards').indexOf(card) < 0)

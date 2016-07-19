@@ -72,8 +72,9 @@ describe('orderGroup()', () => {
     [ 'X1.0 8s.0 6s.0', '6s.0 X1.0 8s.0' ],
     [ '4h.0 X1.0 5h.0', '4h.0 5h.0 X1.0' ],
     // TODO: Add these tests
-    // [ 'X0.0 Ad.0 Qd.0', 'Qd.0 X0.0 Ad.0' ]
-    // [ 'Kd.1 X0.0 Ad.0 Qd.0', 'X0.0 Qd.0 Kd.1 Ad.0' ]
+    [ 'X0.0 Ad.0 Qd.0', 'Qd.0 X0.0 Ad.0' ],
+    [ 'Kd.1 X0.0 Ad.0 Qd.0', 'X0.0 Qd.0 Kd.1 Ad.0' ],
+    [ 'X0.0 Kd.1 Qd.0', 'Qd.0 Kd.1 X0.0']
   ]
 
   orderedGroups.concat(orderedJokerGroups).forEach(example => {

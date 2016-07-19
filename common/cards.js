@@ -90,7 +90,8 @@ export function orderGroup(group) {
   jokers.forEach(joker => {
     // Find a gap
     for (let i = 0; i < group.length-1; i++) {
-      if (getRank(group[i+1]) - getRank(group[i]) > 1) {
+      if (getRank(group[i+1]) - getRank(group[i]) > 1
+      || (getRank(group[i+1]) === 1 && getRank(group[i]) === 12)) {
         group.splice(i+1, 0, joker)
         return
       }
