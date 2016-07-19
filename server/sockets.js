@@ -314,7 +314,7 @@ function sockets(server) {
         .then((room) => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            state = rummy.meldNew(room.toState(), seat, cards)
+            state = rummy.meldNew(room.getCurrentState(), seat, cards)
             return room.saveState(state)
           }
           else {
@@ -345,7 +345,7 @@ function sockets(server) {
         .then(room => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            state = rummy.meldExisting(room.toState(), seat, group, cards)
+            state = rummy.meldExisting(room.getCurrentState(), seat, group, cards)
             return room.saveState(state)
           }
           else {
