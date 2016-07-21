@@ -1,3 +1,4 @@
+/* global FB */
 
 import { EventEmitter } from 'events'
 
@@ -10,51 +11,53 @@ class Auth {
   }
 
   get pictureUrl() {
-    return `https://graph.facebook.com/${userID}/picture`
+    return `https://graph.facebook.com/${this.userID}/picture`
   }
 
   fbInit() {
     (function(d, s, id){
-       let fjs = d.getElementsByTagName(s)[0]
-       if (d.getElementById(id)) {
-         return
-       }
-       let js = d.createElement(s)
-       js.id = id
-       js.src = "//connect.facebook.net/en_US/sdk.js"
-       fjs.parentNode.insertBefore(js, fjs)
-     }(document, 'script', 'facebook-jssdk'))
+      let fjs = d.getElementsByTagName(s)[0]
+      if (d.getElementById(id)) {
+        return
+      }
+      let js = d.createElement(s)
+      js.id = id
+      js.src = '//connect.facebook.net/en_US/sdk.js'
+      fjs.parentNode.insertBefore(js, fjs)
+    }(document, 'script', 'facebook-jssdk'))
 
-     window.fbAsyncInit = () => {
-       FB.init({
-         appId      : this.getConfig('app-id'),
-         xfbml      : false,
-         cookie     : false,
-         version    : 'v2.5'
-       })
+    window.fbAsyncInit = () => {
+      FB.init({
+        appId      : this.getConfig('app-id'),
+        xfbml      : false,
+        cookie     : false,
+        version    : 'v2.5'
+      })
 
-       FB.getLoginStatus((response) => {
-         if (response.status == 'connected') {
-           this.onFBLogin(response)
-         } else {
-           FB.login((response) => {
-             this.onFBLogin(response)
-           }, { scope: 'user_friends, email' })
-         }
-       })
-     }
+      FB.getLoginStatus((response) => {
+        if (response.status === 'connected') {
+          this.onFBLogin(response)
+        }
+        else {
+          FB.login((response) => {
+            this.onFBLogin(response)
+          }, { scope: 'user_friends, email' })
+        }
+      })
+    }
   }
 
   whenReady(callback) {
     if (this.isReady) {
       callback()
-    } else {
-      this.eventEmitter.once("ready", callback)
+    }
+    else {
+      this.eventEmitter.once('ready', callback)
     }
   }
 
   onFBLogin(response) {
-    if (response.status == 'connected' && response.authResponse) {
+    if (response.status === 'connected' && response.authResponse) {
       this.accessToken = response.authResponse.accessToken
       this.userID = response.authResponse.userID
 
@@ -65,15 +68,14 @@ class Auth {
       })
 
       xhr.onreadystatechange = () => {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-          let profile = JSON.parse(xhr.responseText)
-
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          // let profile = JSON.parse(xhr.responseText)
           this.isReady = true
-          this.eventEmitter.emit("ready")
+          this.eventEmitter.emit('ready')
         }
       }
 
-      xhr.open("POST", "/auth/fb", true)
+      xhr.open('POST', '/auth/fb', true)
       xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.send(body)
     }
@@ -82,13 +84,13 @@ class Auth {
   getConfig(name) {
     const element = document.head.querySelector("meta[name='fb-" + name + "']")
     if (element) {
-      const content = element.getAttribute("content")
+      const content = element.getAttribute('content')
       if (content) {
         return content
       }
     }
 
-    console.log(`Cannot find the value for meta property '${name}'`)
+    console.log(`Cannot find the value for meta property '${name}'`) // eslint-disable-line no-console
   }
 }
 

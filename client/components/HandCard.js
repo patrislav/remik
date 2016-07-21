@@ -17,9 +17,9 @@ export default class HandCard extends Component {
 
   render() {
     let className = `playing-card playing-card-${this.getCode()} deck-${this.props.deck}`
-    let wrapperClassName = "entity hand-card-wrapper"
+    let wrapperClassName = 'entity hand-card-wrapper'
     if (this.props.selected) {
-      wrapperClassName += " selected"
+      wrapperClassName += ' selected'
     }
 
     return (
@@ -42,7 +42,9 @@ export default class HandCard extends Component {
   }
 
   _onClick = (event) => {
-    if (this.props.onClick) this.props.onClick()
+    if (this.props.onClick) {
+      this.props.onClick()
+    }
     event.preventDefault()
   }
 }

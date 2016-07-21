@@ -1,21 +1,23 @@
 import React, {Component, PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
 
 import * as Actions from '../actions'
-import auth from '../lib/auth';
-import io from '../socket';
+import auth from '../lib/auth'
+import io from '../socket'
 
-@connect( () => { return {} } )
 export default class Preload extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
    *
-   * @param {Object} props
+   * @param {Object} props Component props
    */
   constructor(props) {
     super(props)
     this.actions = bindActionCreators(Actions, this.props.dispatch)
+  }
+
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired
   }
 
   componentDidMount() {
@@ -38,6 +40,8 @@ export default class Preload extends Component {
 
   /**
    * Getter for the child context object.
+   *
+   * @return {object} context
    */
   getChildContext() {
     return {

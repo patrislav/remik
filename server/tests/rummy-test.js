@@ -1,6 +1,6 @@
 import chai, {expect} from 'chai'
 import chaiImmutable from 'chai-immutable'
-import {Map, List, fromJS} from 'immutable'
+import {List, fromJS} from 'immutable'
 
 import {orderGroup} from '../../common/cards'
 import * as rummy from '../rummy'

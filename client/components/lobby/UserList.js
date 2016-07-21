@@ -1,12 +1,10 @@
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
 
-@connect(state => {
-  return {
-    users: state.lobby.get('users')
-  }
-})
 export default class UserList extends Component {
+  static propTypes = {
+    users: PropTypes.arrayOf(PropTypes.object).isRequired
+  }
+
   render() {
     let userElements = this.props.users.map(user =>
       <li key={user.id}>
@@ -15,7 +13,7 @@ export default class UserList extends Component {
     )
 
     return (
-      <section className='userList'>
+      <section className="userList">
         <ul>
           {userElements}
         </ul>

@@ -12,18 +12,33 @@ import BoardCard from './BoardCard'
 // Helper function
 const getCode = x => x.get('code')
 
-@connect(state => {
-  return {
-    gameStarted: state.game.getIn(['status', 'gameStarted']),
-    phase: state.game.getIn(['status', 'phase']),
-    stock: state.game.getIn(['cards', 'stock']),
-    discard: state.game.getIn(['cards', 'discard']),
-    board: state.game.getIn(['cards', 'board']),
-    hand: state.game.get('hand'),
-    isCurrent: state.game.getIn(['status', 'currentPlayer']) === state.game.get('seat')
-  }
-})
+@connect(state => ({
+  gameStarted: state.game.getIn(['status', 'gameStarted']),
+  phase: state.game.getIn(['status', 'phase']),
+  stock: state.game.getIn(['cards', 'stock']),
+  discard: state.game.getIn(['cards', 'discard']),
+  board: state.game.getIn(['cards', 'board']),
+  hand: state.game.get('hand'),
+  isCurrent: state.game.getIn(['status', 'currentPlayer']) === state.game.get('seat')
+}))
 export default class GameAreaView extends Component {
+  static propTypes = {
+    gameStarted: PropTypes.bool.isRequired, /// Has the game started?
+    isCurrent: PropTypes.bool.isRequired,   /// Is this our turn?
+    stock: PropTypes.number.isRequired,     /// Number of cards on the stock
+    discard: PropTypes.number.isRequired,   /// Number of cards on the stock
+    board: PropTypes.array.isRequired,
+    hand: PropTypes.arrayOf(PropTypes.string).isRequired,
+    phase: PropTypes.oneOf(phases),         /// Current game phase
+
+    onDrawFromStock: PropTypes.func.isRequired,
+    onDrawFromDiscard: PropTypes.func.isRequired,
+    onDiscard: PropTypes.func.isRequired,
+    onMeldNewGroup: PropTypes.func.isRequired,
+    onMeldExisting: PropTypes.func.isRequired,
+    onTakeJoker: PropTypes.func.isRequired,
+  }
+
   render() {
     if (this.props.gameStarted) {
       return (
@@ -33,7 +48,7 @@ export default class GameAreaView extends Component {
             back="blue"
             numCards={this.props.stock}
             onClick={this._onClickStock}
-            highlight={this.props.phase == phases.CARD_TAKING && this.props.isCurrent}
+            highlight={this.props.phase === phases.CARD_TAKING && this.props.isCurrent}
             />
           <DiscardPile
             deck="classic"
@@ -68,13 +83,13 @@ export default class GameAreaView extends Component {
   }
 
   _onClickStock = () => {
-    if (this.props.phase == phases.CARD_TAKING && this.props.isCurrent) {
+    if (this.props.phase === phases.CARD_TAKING && this.props.isCurrent) {
       this.props.onDrawFromStock()
     }
   }
 
   _onClickDiscard = () => {
-    if (this.props.phase == phases.CARD_TAKING && this.props.isCurrent) {
+    if (this.props.phase === phases.CARD_TAKING && this.props.isCurrent) {
       // this.props.onDrawFromDiscard()
     }
     else if (this.canDiscard()) {
@@ -99,25 +114,25 @@ export default class GameAreaView extends Component {
   }
 
   canAddGroup = () => {
-    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+    return this.props.phase === phases.BASE_TURN && this.props.isCurrent
       && this.isValidGroup()
   }
 
   canMeldExisting = (group) => {
-    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+    return this.props.phase === phases.BASE_TURN && this.props.isCurrent
       && this.getSelected().size > 0
       && checkGroupValidity(this.getSelectedCodes().concat(group)).valid
   }
 
   canTakeJoker = (group) => {
-    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
+    return this.props.phase === phases.BASE_TURN && this.props.isCurrent
       && this.getSelected().size === 0
       && takeableJokerPosition(group) > -1
   }
 
   canDiscard = () => {
-    return this.props.phase == phases.BASE_TURN && this.props.isCurrent
-      && this.getSelected().size == 1
+    return this.props.phase === phases.BASE_TURN && this.props.isCurrent
+      && this.getSelected().size === 1
   }
 
   isValidGroup = () => {

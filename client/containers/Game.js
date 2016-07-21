@@ -16,7 +16,7 @@ export default class Game extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
    *
-   * @param {Object} props
+   * @param {Object} props Component props
    */
   constructor(props) {
     super(props)
@@ -27,6 +27,7 @@ export default class Game extends Component {
    * Expected properties object types.
    */
   static propTypes = {
+    dispatch: PropTypes.func.isRequired,
     screen: PropTypes.string
   }
 
@@ -39,6 +40,8 @@ export default class Game extends Component {
 
   /**
    * Getter for the child context object.
+   *
+   * @return {object} context
    */
   getChildContext() {
     return {
@@ -48,17 +51,19 @@ export default class Game extends Component {
 
   /**
    * Render the provided structure.
+   *
+   * @return {React.Component} component
    */
   render() {
     switch(this.props.screen) {
-      case 'lobby':
-        return <Lobby />
+    case 'lobby':
+      return <Lobby />
 
-      case 'play':
-        return <Play />
+    case 'play':
+      return <Play />
 
-      default:
-        return <Preload />
+    default:
+      return <Preload />
     }
   }
 }

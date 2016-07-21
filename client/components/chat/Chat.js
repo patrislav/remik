@@ -4,14 +4,16 @@ import {connect} from 'react-redux'
 import MessageComposer from './MessageComposer'
 import MessageView from './MessageView'
 
-@connect(state => {
-  return {
-    messages: state.chat.get('messages')
-  }
-})
+@connect(state => ({
+  messages: state.chat.get('messages')
+}))
 export default class Chat extends Component {
+  static propTypes = {
+    messages: PropTypes.arrayOf(PropTypes.object).isRequired
+  }
+
   componentDidUpdate() {
-    this._scrollToBottom();
+    this._scrollToBottom()
   }
 
   render() {
@@ -28,9 +30,9 @@ export default class Chat extends Component {
     }
 
     return (
-      <section className='chat'>
-        <div className='content'>
-          <ul className='messageList' ref="messageList">
+      <section className="chat">
+        <div className="content">
+          <ul className="messageList" ref="messageList">
             {messageElements}
             {/*<TypingIndicator users={this.state.typingUsers} />*/}
           </ul>
@@ -41,7 +43,7 @@ export default class Chat extends Component {
   }
 
   _scrollToBottom = () => {
-    let ul = this.refs.messageList;
-    ul.scrollTop = ul.scrollHeight;
+    let ul = this.refs.messageList
+    ul.scrollTop = ul.scrollHeight
   }
 }

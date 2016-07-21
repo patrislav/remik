@@ -4,10 +4,11 @@
   },
   "private": true,
   "name": "remik-game",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Facebook Rummy game",
   "scripts": {
     "test": "./node_modules/.bin/mocha $(find common server -name '*-test.js') --compilers js:babel-core/register",
+    "lint": "./node_modules/.bin/eslint client common server",
     "start": "./node_modules/.bin/babel-node tools/run start",
     "clean": "./node_modules/.bin/babel-node tools/run clean",
     "copy": "./node_modules/.bin/babel-node tools/run copy",
@@ -17,6 +18,20 @@
   },
   "author": "Patryk Kalinowski",
   "license": "ISC",
+  "eslintConfig": {
+    "extends": "eslint-config-patrislav",
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true,
+      "browser": true,
+      "mocha": true,
+      "es6": true
+    }
+  },
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-core": "^6.10.4",
@@ -33,6 +48,10 @@
     "css-loader": "^0.23.1",
     "dateformat": "^1.0.12",
     "del": "^2.2.0",
+    "eslint": "^3.1.1",
+    "eslint-config-patrislav": "^0.1.0",
+    "eslint-plugin-import": "^1.11.1",
+    "eslint-plugin-react": "^5.2.2",
     "extend": "^3.0.0",
     "fbjs": "^0.8.0",
     "file-loader": "^0.9.0",

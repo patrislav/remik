@@ -3,14 +3,20 @@ import React, {Component, PropTypes} from 'react'
 import '../styles/cards.scss'
 
 export default class BoardGroup extends Component {
+  static propTypes = {
+    canClick: PropTypes.bool,
+    onClick: PropTypes.func,
+    children: PropTypes.arrayOf(PropTypes.element)
+  }
+
   render() {
     // TODO: magic numbers are not cool, these come from cards.scss
     const numChildren = this.props.children.length
     const width = (numChildren ? 62 + (numChildren-1)*17 : 0)
 
-    let className = "boardGroup"
+    let className = 'boardGroup'
     if (this.props.canClick) {
-      className += " group-highlight"
+      className += ' group-highlight'
     }
 
     return (

@@ -166,38 +166,38 @@ export function applyChanges(state) {
 
   changes.forEach(change => {
     switch (change.get('type')) {
-      case 'meldNew':
-        board = board.push(change.get('cards'))
-        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+    case 'meldNew':
+      board = board.push(change.get('cards'))
+      players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
           cards.filter(card => change.get('cards').indexOf(card) < 0)
         )
-        break
+      break
 
-      case 'meldExisting': {
-        const index = findGroupIndex(state, change.get('group').toJS())
-        if (index >= 0) {
-          board = board.update(index, group =>
+    case 'meldExisting': {
+      const index = findGroupIndex(state, change.get('group').toJS())
+      if (index >= 0) {
+        board = board.update(index, group =>
             fromJS(orderGroup(group.concat(change.get('cards')).toJS()))
           )
-          players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
             cards.filter(card => change.get('cards').indexOf(card) < 0)
           )
-        }
-        break
       }
+      break
+    }
 
-      case 'takeJoker': {
-        const index = findGroupIndex(state, change.get('group').toJS())
-        if (index >= 0) {
-          const position = takeableJokerPosition(board.get(index).toJS())
-          const joker = board.getIn([index, position])
-          board = board.update(index, group => group.delete(position))
-          players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
+    case 'takeJoker': {
+      const index = findGroupIndex(state, change.get('group').toJS())
+      if (index >= 0) {
+        const position = takeableJokerPosition(board.get(index).toJS())
+        const joker = board.getIn([index, position])
+        board = board.update(index, group => group.delete(position))
+        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
             cards.push(joker)
           )
-        }
-        break
       }
+      break
+    }
     }
   })
 

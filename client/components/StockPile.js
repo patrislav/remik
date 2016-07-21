@@ -13,10 +13,10 @@ export default class StockPile extends Component {
 
   render() {
     let className = `playing-card playing-card-back-${this.props.back} deck-${this.props.deck}`,
-      wrapperClassName = "entity pile-card-wrapper"
+      wrapperClassName = 'entity pile-card-wrapper'
 
     if (this.props.highlight) {
-      wrapperClassName += " pile-highlight"
+      wrapperClassName += ' pile-highlight'
     }
 
     return (
@@ -31,7 +31,9 @@ export default class StockPile extends Component {
   }
 
   _onClick = (event) => {
-    if (this.props.onClick) this.props.onClick()
+    if (this.props.onClick) {
+      this.props.onClick()
+    }
     event.preventDefault()
   }
 }

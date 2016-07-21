@@ -9,23 +9,30 @@ import UserList from '../components/room/UserList'
 import Chat from '../components/chat'
 import GameView from '../components/GameView'
 
-@connect(state => {
-  return {
-    user: state.game.get('user'),
-    players: state.room.get('players').toJS(),
-    playerCards: state.game.getIn(['cards', 'players']).toJS(),
-    currentPlayer: state.game.getIn(['status', 'currentPlayer'])
-  }
-})
+@connect(state => ({
+  user: state.game.get('user'),
+  players: state.room.get('players').toJS(),
+  playerCards: state.game.getIn(['cards', 'players']).toJS(),
+  currentPlayer: state.game.getIn(['status', 'currentPlayer'])
+}))
 export default class Play extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
    *
-   * @param {Object} props
+   * @param {Object} props Component properties
    */
   constructor(props) {
     super(props)
     this.actions = bindActionCreators(Actions, this.props.dispatch)
+  }
+
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+
+    user: PropTypes.object,
+    players: PropTypes.arrayOf(PropTypes.object),
+    playerCards: PropTypes.arrayOf(PropTypes.string),
+    currentPlayer: PropTypes.object
   }
 
   /**
@@ -37,6 +44,8 @@ export default class Play extends Component {
 
   /**
    * Getter for the child context object.
+   *
+   * @return {object} context
    */
   getChildContext() {
     return {
@@ -46,7 +55,7 @@ export default class Play extends Component {
 
   render() {
     return (
-      <div className='play'>
+      <div className="play">
         <aside>
           <UserList
             players={this.props.players}

@@ -12,7 +12,7 @@ class Socket {
     socket = io()
 
     socket.on('exception', (...data) => {
-      console.log('Error: ', ...data);
+      console.log('Error: ', ...data) // eslint-disable-line no-console
     })
 
     socket.on('me', user => {

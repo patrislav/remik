@@ -1,7 +1,6 @@
 
-import {Map, fromJS} from 'immutable'
+import {fromJS} from 'immutable'
 import { model, index } from 'mongoose-decorators'
-import User from './user'
 import {startGame, stopGame, applyChanges} from '../rummy'
 import {phases} from '../../common/constants'
 
@@ -57,7 +56,7 @@ class Room {
   /**
    * Adds a user with the given ID
    *
-   * @param {string} userId
+   * @param {string} userId The user ID
    */
   addUser(userId) {
     if (!this.users.includes(userId)) {
@@ -201,7 +200,7 @@ class Room {
 
   getSeatByUserId(userId) {
     for (let i in this.players) {
-      if (this.players[i] && this.players[i].id == userId) {
+      if (this.players[i] && this.players[i].id === userId) {
         return i
       }
     }

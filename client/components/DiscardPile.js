@@ -14,10 +14,10 @@ export default class DiscardPile extends Component {
   render() {
     if (this.props.lastCard) {
       let className = `playing-card playing-card-${this.getLastCardCode()} deck-${this.props.deck}`,
-        wrapperClassName = "entity pile-card-wrapper"
+        wrapperClassName = 'entity pile-card-wrapper'
 
       if (this.props.highlight) {
-        wrapperClassName += " pile-highlight"
+        wrapperClassName += ' pile-highlight'
       }
 
       return (
@@ -42,7 +42,9 @@ export default class DiscardPile extends Component {
   }
 
   _onClick = (event) => {
-    if (this.props.onClick) this.props.onClick()
+    if (this.props.onClick) {
+      this.props.onClick()
+    }
     event.preventDefault()
   }
 }

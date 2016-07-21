@@ -24,7 +24,9 @@ export default class GroupAdder extends Component {
   }
 
   _onClick = (event) => {
-    if (this.props.onClick) this.props.onClick(event)
+    if (this.props.onClick) {
+      this.props.onClick(event)
+    }
     event.preventDefault()
   }
 }

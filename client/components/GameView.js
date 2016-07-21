@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 
 import GameAreaView from './GameAreaView'
 import HandView from './HandView'
@@ -6,7 +6,7 @@ import HandView from './HandView'
 export default class GameView extends Component {
   render() {
     return (
-      <section className='gameView'>
+      <section className="gameView">
         <GameAreaView {...this.props} />
         <HandView {...this.props} />
       </section>

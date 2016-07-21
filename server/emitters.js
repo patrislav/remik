@@ -10,7 +10,7 @@ export default function (io, realm) {
         target.emit('lobby.users', users)
       }
       catch(error) {
-        console.log('emitLobbyUsers', error)
+        console.log('emitLobbyUsers', error) // eslint-disable-line no-console
       }
     },
 
@@ -22,7 +22,7 @@ export default function (io, realm) {
           })
       }
       catch(e) {
-        console.log('emitRoomUsers', e)
+        console.log('emitRoomUsers', e) // eslint-disable-line no-console
       }
     },
 
@@ -39,7 +39,7 @@ export default function (io, realm) {
           })
       }
       catch(e) {
-        console.log('emitRooms', e)
+        console.log('emitRooms', e) // eslint-disable-line no-console
       }
     },
 

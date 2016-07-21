@@ -8,17 +8,15 @@ import * as Actions from '../actions'
 import FriendList from '../components/lobby/FriendList'
 import RoomList from '../components/lobby/RoomList'
 
-@connect(state => {
-  return {
-    friends: state.lobby.get('friends'),
-    rooms: state.lobby.get('rooms')
-  }
-})
+@connect(state => ({
+  friends: state.lobby.get('friends'),
+  rooms: state.lobby.get('rooms')
+}))
 export default class Lobby extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
    *
-   * @param {Object} props
+   * @param {Object} props Component properties
    */
   constructor(props) {
     super(props)
@@ -26,9 +24,16 @@ export default class Lobby extends Component {
   }
 
   componentDidMount() {
+    /* global FB */
     FB.api('/me/invitable_friends', (response) => {
       this.actions.receiveLobbyFriends(response.data)
     })
+  }
+
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    friends: PropTypes.arrayOf(PropTypes.object).isRequired,
+    rooms: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
   /**
@@ -40,6 +45,8 @@ export default class Lobby extends Component {
 
   /**
    * Getter for the child context object.
+   *
+   * @return {object} context
    */
   getChildContext() {
     return {
@@ -49,7 +56,7 @@ export default class Lobby extends Component {
 
   render() {
     return (
-      <div className='lobby'>
+      <div className="lobby">
         <aside>
           <FriendList users={this.props.friends} />
         </aside>

@@ -8,7 +8,7 @@ function database(app, mongoose) {
     server: {
       socketOptions: { keepAlive: true }
     },
-    auto_reconnect: true
+    auto_reconnect: true // eslint-disable-line camelcase
   }
 
   const connect = function() {
@@ -19,7 +19,7 @@ function database(app, mongoose) {
 
   // Error handler
   mongoose.connection.on('error', (error) => {
-    console.error('Connection error: ' + error)
+    console.error('Connection error: ' + error) // eslint-disable-line no-console
   })
 
   // Reconnect when disconnected

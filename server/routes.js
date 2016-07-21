@@ -4,7 +4,7 @@ import config from './config'
 
 const router = express.Router()
 
-router.get('/',(req, res) => {
+router.get('/', (req, res) => {
   res.render('index')
 })
 

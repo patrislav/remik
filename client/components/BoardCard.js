@@ -10,7 +10,7 @@ export default class BoardCard extends Component {
 
   render() {
     let className = `playing-card playing-card-${this.getCode()} deck-${this.props.deck}`
-    let wrapperClassName = "entity table-card-wrapper"
+    let wrapperClassName = 'entity table-card-wrapper'
 
     return (
       <li

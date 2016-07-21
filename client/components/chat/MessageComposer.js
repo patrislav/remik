@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 
 import io from '../../socket'
 
@@ -15,7 +15,7 @@ export default class MessageComposer extends Component {
 
   render() {
     return (
-      <div className='messageComposer'>
+      <div className="messageComposer">
         <textarea
           name="chat-message"
           value={this.state.text}
@@ -42,10 +42,10 @@ export default class MessageComposer extends Component {
   }
 
   _onSubmit = () => {
-    let message = this.state.text.trim();
+    let message = this.state.text.trim()
     if (message) {
       io.socket.emit('chat.message', message)
-      this.setState({ text: '' });
+      this.setState({ text: '' })
     }
   }
 

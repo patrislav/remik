@@ -3,6 +3,12 @@ import React, {Component, PropTypes} from 'react'
 import RoomListItem from './RoomListItem'
 
 export default class RoomList extends Component {
+  static propTypes = {
+    rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
+
+    onJoin: PropTypes.func.isRequired,
+    onCreate: PropTypes.func.isRequired
+  }
 
   render() {
     let roomElements = []
@@ -17,7 +23,7 @@ export default class RoomList extends Component {
     }
 
     return (
-      <section className='roomList'>
+      <section className="roomList">
         <h3>Tables</h3>
         <button onClick={this.props.onCreate}>Create table</button>
         <ul>

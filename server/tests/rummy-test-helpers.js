@@ -1,4 +1,4 @@
-import {PLAYER_COLOURS, SUIT_SYMBOLS, RANK_CODES} from '../../common/constants'
+import {PLAYER_COLOURS} from '../../common/constants'
 import rewire from 'rewire'
 
 const rummyModule = rewire('../rummy.js')

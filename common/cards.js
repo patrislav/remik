@@ -1,6 +1,6 @@
 
 import {
-  RANKS, RANK_SYMBOLS, RANK_CODES, SUIT_SYMBOLS
+  RANK_SYMBOLS, SUIT_SYMBOLS
 } from './constants'
 
 export function checkGroupValidity(cards) {
@@ -13,19 +13,21 @@ export function checkGroupValidity(cards) {
   let ranks = cards.map(getRank),
     ranksWithoutJokers = ranks.filter(rank => rank !== 'X'),
     uniqueValues = unique(ranksWithoutJokers),
-    jokerCount = ranks.reduce((total, x) => (x === 'X' ? total+1 : total), 0)
+    jokerCount = ranks.reduce((total, x) => {
+      return (x === 'X' ? total+1 : total)
+    }, 0)
 
   let suits = cards.map(getSuit),
     suitsWithoutJokers = suits.filter(suit => suit !== 'X'),
     uniqueSuits = unique(suitsWithoutJokers)
 
-  if ((ranks.length == 3 && jokerCount > 1)
-  || ( ranks.length == 4 && jokerCount > 2)) {
+  if ((ranks.length === 3 && jokerCount > 1)
+  || ( ranks.length === 4 && jokerCount > 2)) {
     return { valid: false, reason: 'TODO' }
   }
 
   // Set
-  if (uniqueValues.length == 1 && uniqueSuits.length == suitsWithoutJokers.length) {
+  if (uniqueValues.length === 1 && uniqueSuits.length === suitsWithoutJokers.length) {
     return { valid: true, groupType: 'set' }
   }
 
@@ -44,7 +46,7 @@ export function checkGroupValidity(cards) {
   }
 
   // Run
-  if (uniqueSuits.length == 1 && uniqueValues.length == ranksWithoutJokers.length
+  if (uniqueSuits.length === 1 && uniqueValues.length === ranksWithoutJokers.length
   && isConsecutive(ranksWithoutJokers, jokerCount)) {
     return { valid: true, groupType: 'run' }
   }
@@ -140,26 +142,6 @@ function getSuit(card) {
   }
   return SUIT_SYMBOLS.indexOf(card.charAt(1))
 }
-
-function parseCardCode(code) {
-  if (code.charAt(0) === 'X') {
-    return { joker: 1, suit: 'X', rank: 'X' }
-  }
-
-  const regex = new RegExp(`(${RANK_CODES.join('|')})(${SUIT_SYMBOLS.join('|')})`, 'g')
-
-  const match = regex.exec(code)
-
-  if (!match) {
-    return false
-  }
-
-  let rank = ((match[1] in RANK_SYMBOLS) ? RANK_SYMBOLS[match[1]] : parseInt(match[1])),
-    suit = SUIT_SYMBOLS.indexOf(match[2])
-
-  return { rank, suit }
-}
-
 
 function unique(array) {
   let seen = new Set()

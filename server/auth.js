@@ -16,7 +16,7 @@ router.post('/fb', (req, res) => {
 
   let accessToken = req.body.accessToken
   if (!accessToken) {
-    res.status(500).send(JSON.stringify({ error: "No access token provided!" }))
+    res.status(500).send(JSON.stringify({ error: 'No access token provided!' }))
     return
   }
 
@@ -24,7 +24,8 @@ router.post('/fb', (req, res) => {
   FB.withAccessToken(accessToken).napi('me', { fields: fields }, async (error, response) => {
     if (error) {
       res.status(500).send(JSON.stringify({ error: `FB API Error: ${error.message}` }))
-    } else {
+    }
+    else {
       try {
         let user = await User.findById('fb', response.id)
         if (!user) {
@@ -41,7 +42,7 @@ router.post('/fb', (req, res) => {
         res.send(JSON.stringify(user))
       }
       catch(error) {
-        console.log('Error:', error)
+        console.log('Error:', error) // eslint-disable-line no-console
       }
     }
   })

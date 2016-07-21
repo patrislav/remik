@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import socketIO from 'socket.io'
 import User from './models/user'
 import Room from './models/room'
@@ -13,7 +15,7 @@ function dumpError(error) {
     console.error(error.message)
   }
   if (error.stack) {
-    console.error("\nStacktrace\n====================")
+    console.error('\nStacktrace\n====================')
     console.error(error.stack)
   }
 }
@@ -96,7 +98,7 @@ function sockets(server) {
     socket.on('room.join', async (roomId) => {
       try {
         let check = await Room.findOne({ realm, users: user.id }).exec()
-        if (check && check.id != roomId) {
+        if (check && check.id !== roomId) {
           socket.emit('exception', 'room.join', 'already in a room')
           return
         }
@@ -120,6 +122,7 @@ function sockets(server) {
       }
     })
 
+    // eslint-disable-next-line no-unused-vars
     socket.on('room.leave', async (roomId) => {
       let stoppedGame = false
       Room.findOne({ realm, users: user.id })

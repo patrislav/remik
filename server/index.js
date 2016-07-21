@@ -19,7 +19,7 @@ const httpServer = http.createServer(app)
 const redisClient = redis.createClient(config.redis.uri)
 const RedisStore = connectRedis(session)
 
-const db = database(app, mongoose)
+const db = database(app, mongoose) // eslint-disable-line no-unused-vars
 const io = sockets(httpServer)
 
 const sessionMiddleware = session({
@@ -48,10 +48,11 @@ app.use('/', routes)
 app.use('/auth', authProvider)
 
 // Socket.IO Middlewares
-io.use(function(socket, next) {
+io.use((socket, next) => {
   sessionMiddleware(socket.request, socket.request.res, next)
 })
 
 httpServer.listen(config.port, () => {
+  // eslint-disable-next-line no-console
   console.log(`The server is running at http://localhost:${config.port}`)
 })

@@ -3,12 +3,15 @@ import {connect} from 'react-redux'
 
 import HandCard from './HandCard'
 
-@connect(state => {
-  return {
-    cards: state.game.get('hand').toJS()
-  }
-})
+@connect(state => ({
+  cards: state.game.get('hand').toJS()
+}))
 export default class HandView extends Component {
+  static propTypes = {
+    cards: PropTypes.array.isRequired,
+    onSelectHandCard: PropTypes.func.isRequired
+  }
+
   render() {
     let areaWidth = 550,
       gutterWidth = 25,

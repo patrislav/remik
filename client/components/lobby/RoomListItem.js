@@ -1,6 +1,11 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react'
 
 export default class RoomListItem extends Component {
+  static propTypes = {
+    room: PropTypes.object.isRequired,
+    joinRoom: PropTypes.func.isRequired
+  }
+
   render() {
     return (
       <li>
