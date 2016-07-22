@@ -45,7 +45,7 @@ export default function (io, realm) {
 
     // FIXME: Improve performance?
     gameStart: (target = io, room) => {
-      let data = {
+      const data = {
         board: room.cards.board,
         stock: room.cards.stock.length,
         discard: room.getLastDiscard(),
@@ -56,7 +56,7 @@ export default function (io, realm) {
       target.emit('game.cards', room.id, data)
 
       for (let seat in room.players) {
-        let player = room.players[seat]
+        const player = room.players[seat]
         User.findOne({ realm, id: player.id })
           .then(user => {
             io.to(user.socketId).emit('game.hand', room.id, player.cards)
@@ -65,8 +65,8 @@ export default function (io, realm) {
     },
 
     gameCards: (target = io, room) => {
-      let state = room.getCurrentState()
-      let data = {
+      const state = room.getCurrentState()
+      const data = {
         board: state.getIn(['cards', 'board']).toJS(),
         stock: state.getIn(['cards', 'stock']).size,
         discard: room.getLastDiscard(),
@@ -74,6 +74,14 @@ export default function (io, realm) {
       }
 
       target.emit('game.cards', room.id, data)
+    },
+
+    playerHand: (target = io, room, user) => {
+      const state = room.getCurrentState()
+      const player = state.get('players').find(player => player.get('id') === user.id)
+      if (player) {
+        target.emit('game.hand', room.id, player.get('cards').toJS())
+      }
     }
   }
 }

@@ -212,6 +212,10 @@ export function rollbackChanges(state) {
   return state.update('changes', changes => changes.clear())
 }
 
+export function undoLastChange(state) {
+  return state.update('changes', changes => changes.pop())
+}
+
 export function findGroupIndex(state, group) {
   group = group.slice() // don't mutate the array!
   return state.getIn(['cards', 'board']).findIndex(g => g.toJS().sort().toString() === group.sort().toString())

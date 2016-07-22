@@ -306,6 +306,37 @@ describe('rummy', () => {
     })
   })
 
+  describe('undoLastChange()', () => {
+    it('removes the last change', () => {
+      const lastChange = fromJS({ type: 'test', payload: 123 })
+      const state = fromJS({
+        changes: [{ type: 'firstChange', payload: 'data' }, lastChange]
+      })
+
+      expect(rummy.undoLastChange(state))
+        .to.have.property('changes')
+        .with.sizeOf(1)
+        .that.not.includes(lastChange)
+    })
+
+    describe('if the list of changes is empty', () => {
+      const state = fromJS({
+        changes: []
+      })
+
+      it("doesn't do anything", () => {
+        expect(rummy.undoLastChange(state))
+          .to.have.property('changes')
+          .that.is.empty
+      })
+
+      it("doesn't throw any error", () => {
+        expect(() => rummy.undoLastChange(state))
+          .to.not.throw(Error)
+      })
+    })
+  })
+
   describe('findGroupIndex()', () => {
     const board = [
       ['As.0', 'Ah.0', 'Ad.0'],

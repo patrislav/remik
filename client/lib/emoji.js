@@ -1,6 +1,6 @@
 
-import _escape from 'lodash/string/escape'
-import _escapeRegExp from 'lodash/string/escapeRegExp'
+import _escape from 'lodash/escape'
+import _escapeRegExp from 'lodash/escapeRegExp'
 import './emoji.scss'
 
 const _conversionTable = {

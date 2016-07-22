@@ -263,16 +263,9 @@ function sockets(server) {
           }
         })
         .then((room) => {
-          let currentState = room.getCurrentState()
-
           io.to(room.id).emit('game.drew_card', room.id, user.id, room.status)
           emit.gameCards(io.to(room.id), room)
-
-          // TODO: Temporary!!!
-          const player = currentState.get('players').find(player => player.get('id') === user.id)
-          if (player) {
-            socket.emit('game.hand', room.id, player.get('cards').toJS())
-          }
+          emit.playerHand(socket, room, user)
         })
         .catch(e => dumpError(e))
     })
@@ -291,16 +284,9 @@ function sockets(server) {
           }
         })
         .then((room) => {
-          let currentState = room.getCurrentState()
-
           io.to(room.id).emit('game.discarded', room.id, user.id, room.status, state.get('discardedCard'))
           emit.gameCards(io.to(room.id), room)
-
-          // TODO: Temporary!!!
-          const player = currentState.get('players').find(player => player.get('id') === user.id)
-          if (player) {
-            socket.emit('game.hand', room.id, player.get('cards').toJS())
-          }
+          emit.playerHand(socket, room, user)
         })
         .catch(e => dumpError(e))
     })
@@ -323,12 +309,7 @@ function sockets(server) {
 
           io.to(room.id).emit('game.melded_new', room.id, user.id, currentState.status, state.get('meldedCards'))
           emit.gameCards(io.to(room.id), room)
-
-          // TODO: Temporary!!!
-          const player = currentState.get('players').find(player => player.get('id') === user.id)
-          if (player) {
-            socket.emit('game.hand', room.id, player.get('cards').toJS())
-          }
+          emit.playerHand(socket, room, user)
         })
         .catch(e => dumpError(e))
     })
@@ -351,12 +332,7 @@ function sockets(server) {
 
           io.to(room.id).emit('game.melded_existing', room.id, user.id, currentState.status)
           emit.gameCards(io.to(room.id), room)
-
-          // TODO: Temporary!!!
-          const player = currentState.get('players').find(player => player.get('id') === user.id)
-          if (player) {
-            socket.emit('game.hand', room.id, player.get('cards').toJS())
-          }
+          emit.playerHand(socket, room, user)
         })
         .catch(e => dumpError(e))
     })
@@ -375,18 +351,32 @@ function sockets(server) {
           }
         })
         .then(room => {
-          let currentState = room.getCurrentState()
-
           // io.to(room.id).emit('game.took_joker', room.id, user.id, currentState.status)
           emit.gameCards(io.to(room.id), room)
-
-          // TODO: Temporary!!!
-          const player = currentState.get('players').find(player => player.get('id') === user.id)
-          if (player) {
-            socket.emit('game.hand', room.id, player.get('cards').toJS())
-          }
+          emit.playerHand(socket, room, user)
         })
         .catch(e => dumpError(e))
+    })
+
+    socket.on('game.undo_last', () => {
+      let state = {}
+      Room.findOne({ realm, users: user.id })
+        .then(room => {
+          let seat = room.getSeatByUserId(user.id)
+          if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
+            // console.log(room.getCurrentState().get('changes').toJS())
+            state = rummy.undoLastChange(room.toState())
+            return room.saveState(state)
+          }
+          else {
+            throw new Error("Not player's turn!")
+          }
+        })
+        .then(room => {
+          // console.log(room.getCurrentState().get('changes').toJS())
+          emit.gameCards(io.to(room.id), room)
+          emit.playerHand(socket, room, user)
+        })
     })
 
     socket.on('game.leave', async () => {

@@ -30,9 +30,9 @@ export default class Play extends Component {
     dispatch: PropTypes.func.isRequired,
 
     user: PropTypes.object,
-    players: PropTypes.arrayOf(PropTypes.object),
-    playerCards: PropTypes.arrayOf(PropTypes.string),
-    currentPlayer: PropTypes.object
+    players: PropTypes.object,
+    playerCards: PropTypes.object,
+    currentPlayer: PropTypes.string
   }
 
   /**
@@ -77,6 +77,7 @@ export default class Play extends Component {
             onMeldNewGroup={this._onMeldNewGroup}
             onMeldExisting={this._onMeldExisting}
             onTakeJoker={this._onTakeJoker}
+            onUndoLast={this._onUndoLast}
             />
         </main>
       </div>
@@ -135,5 +136,9 @@ export default class Play extends Component {
 
   _onTakeJoker = (group) => {
     io.socket.emit('game.take_joker', group)
+  }
+
+  _onUndoLast = () => {
+    io.socket.emit('game.undo_last')
   }
 }

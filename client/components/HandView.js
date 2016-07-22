@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 
 import HandCard from './HandCard'
+import UndoLastButton from './UndoLastButton'
 
 @connect(state => ({
   cards: state.game.get('hand').toJS()
@@ -9,7 +10,8 @@ import HandCard from './HandCard'
 export default class HandView extends Component {
   static propTypes = {
     cards: PropTypes.array.isRequired,
-    onSelectHandCard: PropTypes.func.isRequired
+    onSelectHandCard: PropTypes.func.isRequired,
+    onUndoLast: PropTypes.func.isRequired
   }
 
   render() {
@@ -32,6 +34,11 @@ export default class HandView extends Component {
 
     return (
       <div className="handView">
+        <div>
+          <UndoLastButton
+            onClick={this._onUndoLast}
+          />
+        </div>
         {cardElements}
       </div>
     )
@@ -41,5 +48,9 @@ export default class HandView extends Component {
     return () => {
       this.props.onSelectHandCard(cardCode)
     }
+  }
+
+  _onUndoLast = () => {
+    this.props.onUndoLast()
   }
 }

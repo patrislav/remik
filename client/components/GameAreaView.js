@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import Immutable from 'immutable'
 import {connect} from 'react-redux'
 import {phases} from '../../common/constants'
 import {checkGroupValidity, takeableJokerPosition} from '../../common/cards'
@@ -23,13 +24,13 @@ const getCode = x => x.get('code')
 }))
 export default class GameAreaView extends Component {
   static propTypes = {
-    gameStarted: PropTypes.bool.isRequired, /// Has the game started?
-    isCurrent: PropTypes.bool.isRequired,   /// Is this our turn?
-    stock: PropTypes.number.isRequired,     /// Number of cards on the stock
-    discard: PropTypes.number.isRequired,   /// Number of cards on the stock
-    board: PropTypes.array.isRequired,
-    hand: PropTypes.arrayOf(PropTypes.string).isRequired,
-    phase: PropTypes.oneOf(phases),         /// Current game phase
+    gameStarted: PropTypes.bool, /// Has the game started?
+    isCurrent: PropTypes.bool,   /// Is this our turn?
+    stock: PropTypes.number,     /// Number of cards on the stock
+    discard: PropTypes.string,   /// The last discarded card
+    board: PropTypes.instanceOf(Immutable.List),
+    hand: PropTypes.instanceOf(Immutable.List),
+    phase: PropTypes.oneOf(Object.values(phases)),         /// Current game phase
 
     onDrawFromStock: PropTypes.func.isRequired,
     onDrawFromDiscard: PropTypes.func.isRequired,

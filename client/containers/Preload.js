@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux'
 
 import * as Actions from '../actions'
 import auth from '../lib/auth'
 import io from '../socket'
 
+@connect()
 export default class Preload extends Component {
   /**
    * On class initialization bind all the actions to the dispatch function.
