@@ -59,7 +59,7 @@ export default function (io, realm) {
         const player = room.players[seat]
         User.findOne({ realm, id: player.id })
           .then(user => {
-            io.to(user.socketId).emit('game.hand', room.id, player.cards)
+            io.to(user.socketId).emit('game.hand', room.id, player)
           })
       }
     },
@@ -80,7 +80,7 @@ export default function (io, realm) {
       const state = room.getCurrentState()
       const player = state.get('players').find(player => player.get('id') === user.id)
       if (player) {
-        target.emit('game.hand', room.id, player.get('cards').toJS())
+        target.emit('game.hand', room.id, player.toJS())
       }
     }
   }

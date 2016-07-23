@@ -1,6 +1,6 @@
 
 import {fromJS} from 'immutable'
-import { model, index } from 'mongoose-decorators'
+import {model, index} from 'mongoose-decorators'
 import {startGame, stopGame, applyChanges} from '../rummy'
 import {phases} from '../../common/constants'
 
@@ -9,6 +9,7 @@ const Player = (userId) => {
     id: userId,
     cards: [],
     drewFromDiscard: null,
+    jokerTaken: null,
     melded: false,
     madeFirstMove: false
   }

@@ -5,6 +5,7 @@ import {List, fromJS} from 'immutable'
 import {orderGroup} from '../../common/cards'
 import * as rummy from '../rummy'
 import {randomCards} from './rummy-test-helpers'
+import {phases} from '../../common/constants'
 
 chai.use(chaiImmutable)
 
@@ -106,12 +107,9 @@ describe('rummy', () => {
         group, cards
       })
 
-      it('adds the change to changes list', () => {
+      it('returns the correct change object', () => {
         expect(rummy.meldExisting(state, seat, group, cards))
-          .to.have.property('changes')
-          .that.is.an.instanceof(List)
-          .with.deep.property([0])
-          .that.equals(expectedChange)
+          .to.be.equal(expectedChange)
       })
     })
 
@@ -131,7 +129,13 @@ describe('rummy', () => {
           board: [
             ['X0.0', '7d.0', '8d.1', '9d.0'] // Slightly different
           ]
-        }
+        },
+        players: {
+          [seat]: {
+            cards: [],
+            jokerTaken: null
+          }
+        },
       })
 
       it('throws an error', () => {
@@ -147,12 +151,41 @@ describe('rummy', () => {
           board: [
             group
           ]
+        },
+        players: {
+          [seat]: {
+            cards: [],
+            jokerTaken: null
+          }
         }
       })
 
       it('throws an error', () => {
         const fn = () => rummy.takeJoker(state, seat, group)
         expect(fn).to.throw(/invalid/)
+      })
+    })
+
+    describe('when the jokerTaken property is not cleared out', () => {
+      const group = ['X0.0', '7d.0', '8d.0', '9d.0']
+      const state = fromJS({
+        cards: {
+          board: [
+            group
+          ]
+        },
+        players: {
+          [seat]: {
+            cards: ['X1.0'],
+            jokerTaken: 'X1.0'
+          }
+        },
+        changes: []
+      })
+
+      it('throws an error', () => {
+        const fn = () => rummy.takeJoker(state, seat, group)
+        expect(fn).to.throw(Error)
       })
     })
 
@@ -164,6 +197,12 @@ describe('rummy', () => {
             group
           ]
         },
+        players: {
+          [seat]: {
+            cards: [],
+            jokerTaken: null
+          }
+        },
         changes: []
       })
 
@@ -173,34 +212,98 @@ describe('rummy', () => {
         group
       })
 
-      it('adds the change to changes list', () => {
+      it('returns the correct change object', () => {
         expect(rummy.takeJoker(state, seat, group))
-          .to.have.property('changes')
-          .that.is.an.instanceof(List)
-          .with.deep.property([0])
-          .that.equals(expectedChange)
+          .to.be.equal(expectedChange)
       })
     })
   })
 
   describe('finishTurn()', () => {
-    // TODO: Add tests!
+    const discarded = 'As.0'
+    const cards = ['2d.1', '3s.0', discarded]
+    const seat = 'red', otherSeat = 'blue'
+    const initialState = fromJS({
+      status: {
+        currentPlayer: seat,
+        phase: phases.BASE_TURN
+      },
+      cards: {
+        board: [],
+        discard: []
+      },
+      players: {
+        [seat]: {
+          cards,
+          jokerTaken: null
+        },
+        [otherSeat]: {
+          cards: ['7c.0']
+        }
+      },
+      changes: []
+    })
+
+    it('puts the discarded card onto the discard pile', () => {
+      expect(rummy.finishTurn(initialState, seat, discarded))
+        .to.have.deep.property(['cards', 'discard'])
+        .that.is.instanceof(List)
+        .with.property([0])
+        .that.is.equal(discarded)
+    })
+
+    it("removes the discarded card from the player's hand", () => {
+      expect(rummy.finishTurn(initialState, seat, discarded))
+        .to.have.deep.property(['players', seat, 'cards'])
+        .that.is.instanceof(List)
+        .with.sizeOf(2)
+        .that.not.includes(discarded)
+    })
+
+    it('changes the phase', () => {
+      expect(rummy.finishTurn(initialState, seat, discarded))
+        .to.have.deep.property(['status', 'phase'])
+        .that.is.equal(phases.CARD_TAKING)
+    })
+
+    it('changes the currentPlayer', () => {
+      expect(rummy.finishTurn(initialState, seat, discarded))
+        .to.have.deep.property(['status', 'currentPlayer'])
+        .that.is.equal(otherSeat)
+    })
+
+    it('clears out the changes list', () => {
+      expect(rummy.finishTurn(initialState, seat, discarded))
+        .to.have.property('changes')
+        .that.is.an.instanceof(List)
+        .which.is.empty
+    })
+
+    it("throws an error if the card is not in player's hand", () => {
+      const state = initialState.updateIn(['players', seat, 'cards'], cards => cards.pop())
+      expect(() => rummy.finishTurn(state, seat, discarded))
+        .to.throw(Error)
+    })
+
+    it('throws an error if jokerTaken property was not cleared out', () => {
+      const state = initialState.setIn(['players', seat, 'jokerTaken'], 'X0.0')
+      expect(() => rummy.finishTurn(state, seat, discarded))
+        .to.throw(Error)
+    })
   })
 
   describe('applyChanges()', () => {
-    // TODO: Add tests for meldNew
-
-    describe('meldExisting', () => {
+    describe('meldNew', () => {
       const seat = 'red'
-      const group = ['7d.0', '8d.0', '9d.0']
-      const cards = ['Dd.0', '6d.1']
+      const cards = ['7d.0', '8d.0', 'X0.0', 'Dd.1']
       const initialState = fromJS({
         cards: {
-          board: [group]
+          board: []
         },
         players: {
           [seat]: {
-            cards
+            cards,
+            jokerTaken: 'X0.0'
           }
         },
         changes: []
@@ -209,7 +312,66 @@ describe('rummy', () => {
       let state
 
       beforeEach(() => {
-        state = rummy.meldExisting(initialState, seat, group, cards)
+        state = initialState.update('changes', changes =>
+          changes.push(rummy.meldNew(seat, cards))
+        )
+      })
+
+      it('adds the change to changes list', () => {
+        expect(state)
+          .to.have.property('changes')
+          .that.is.an.instanceof(List)
+          .with.deep.property([0, 'type'])
+          .that.equals('meldNew')
+      })
+
+      it('puts a new group on the board', () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['cards', 'board'])
+          .that.is.an.instanceof(List)
+          .with.deep.property([0])
+          .that.equals(List(cards))
+      })
+
+      it("removes the cards from player's hand", () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['players', seat, 'cards'])
+          .that.is.an.instanceof(List)
+          .with.sizeOf(0)
+      })
+
+      // Of course only when the cards list includes the value in jokerTaken
+      // which is the case here
+      it('clears out the jokerTaken property', () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['players', seat, 'jokerTaken'])
+          .that.is.null
+      })
+    })
+
+    describe('meldExisting', () => {
+      const seat = 'red'
+      const group = ['7d.0', '8d.0', '9d.0']
+      const cards = ['X0.0', '5d.1']
+      const initialState = fromJS({
+        cards: {
+          board: [group]
+        },
+        players: {
+          [seat]: {
+            cards,
+            jokerTaken: 'X0.0'
+          }
+        },
+        changes: []
+      })
+
+      let state
+
+      beforeEach(() => {
+        state = initialState.update('changes', changes =>
+          changes.push(rummy.meldExisting(initialState, seat, group, cards))
+        )
       })
 
       it('adds the change to changes list', () => {
@@ -234,21 +396,20 @@ describe('rummy', () => {
           .to.have.deep.property(['players', seat, 'cards'])
           .that.is.empty
       })
-    })
 
-    it('clears the changes list', () => {
-      const state = fromJS({
-        changes: [{ mock: 'mock' }, { another: 'another' }]
+      // Of course only when the cards list includes the value in jokerTaken
+      // which is the case here
+      it('clears out the jokerTaken property', () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['players', seat, 'jokerTaken'])
+          .that.is.null
       })
-
-      expect(rummy.rollbackChanges(state))
-        .to.have.property('changes')
-        .that.is.empty
     })
 
     describe('takeJoker', () => {
+      const joker = 'X0.0'
       const seat = 'red'
-      const group = ['X0.0', '7d.0', '8d.0', '9d.0']
+      const group = [joker, '7d.0', '8d.0', '9d.0']
       const cards = ['Dd.0', '6d.1']
       const initialState = fromJS({
         cards: {
@@ -256,7 +417,8 @@ describe('rummy', () => {
         },
         players: {
           [seat]: {
-            cards
+            cards,
+            jokerTaken: null
           }
         },
         changes: []
@@ -265,7 +427,9 @@ describe('rummy', () => {
       let state
 
       beforeEach(() => {
-        state = rummy.takeJoker(initialState, seat, group)
+        state = initialState.update('changes', changes =>
+          changes.push(rummy.takeJoker(initialState, seat, group))
+        )
       })
 
       it('adds the change to changes list', () => {
@@ -289,8 +453,24 @@ describe('rummy', () => {
         expect(rummy.applyChanges(state))
           .to.have.deep.property(['players', seat, 'cards'])
           .that.is.an.instanceof(List)
-          .and.includes('X0.0')
+          .and.includes(joker)
       })
+
+      it('updates the jokerTaken property', () => {
+        expect(rummy.applyChanges(state))
+          .to.have.deep.property(['players', seat, 'jokerTaken'])
+          .that.is.equal(joker)
+      })
+    })
+
+    it('clears the changes list', () => {
+      const state = fromJS({
+        changes: [{ mock: 'mock' }, { another: 'another' }]
+      })
+
+      expect(rummy.rollbackChanges(state))
+        .to.have.property('changes')
+        .that.is.empty
     })
   })
 

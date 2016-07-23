@@ -51,7 +51,14 @@ export function clearBoard(state) {
   return state.set('cards', fromJS(cards)).set('players', fromJS(players))
 }
 
-export function meldNew(state, playerSeat, cards) {
+/**
+ * Meld new card group
+ *
+ * @param {string} playerSeat The colour of current player
+ * @param {string[]} cards The cards to meld
+ * @returns {Immutable.Map} change
+ */
+export function meldNew(playerSeat, cards) {
   const check = checkGroupValidity(cards)
   if (!check.valid) {
     throw new Error('meldNew', check.reason)
@@ -63,12 +70,20 @@ export function meldNew(state, playerSeat, cards) {
     type: 'meldNew',
     playerSeat, cards
   }
-  return state.update('changes', changes => changes.push(fromJS(change)))
-    .set('meldedCards', cards)
+  return fromJS(change)
 }
 
-export function meldExisting(state, playerSeat, group, cards) {
-  if (findGroupIndex(state, group) < 0) {
+/**
+ * Add new cards to an existing group on the board
+ *
+ * @param {Immutable.Map} currentState The current game state
+ * @param {string} playerSeat The colour of current player
+ * @param {string[]} group The group to which the cards should be added
+ * @param {string[]} cards The cards to add
+ * @returns {Immutable.Map} change
+ */
+export function meldExisting(currentState, playerSeat, group, cards) {
+  if (findGroupIndex(currentState, group) < 0) {
     throw new Error('meldExisting no such group found: ' + group)
   }
 
@@ -83,7 +98,7 @@ export function meldExisting(state, playerSeat, group, cards) {
     type: 'meldExisting',
     playerSeat, group, cards
   }
-  return state.update('changes', changes => changes.push(fromJS(change)))
+  return fromJS(change)
 }
 
 // TODO: More checks!!!
@@ -121,8 +136,20 @@ export function drawCard(state, playerSeat, pileName) {
     .set('drewCard', drewCard)
 }
 
-export function takeJoker(state, playerSeat, group) {
-  if (findGroupIndex(state, group) < 0) {
+/**
+ * Take the joker from a group of cards on the board if the joker is free to take.
+ *
+ * @param {Immutable.Map} currentState The current state
+ * @param {string} playerSeat The colour of current player
+ * @param {string[]} group The group from which the joker is to be taken
+ * @returns {Immutable.Map} change
+ */
+export function takeJoker(currentState, playerSeat, group) {
+  if (currentState.getIn(['players', playerSeat, 'jokerTaken']) !== null) {
+    throw new Error('takeJoker This player has taken a joker this turn already')
+  }
+
+  if (findGroupIndex(currentState, group) < 0) {
     throw new Error('takeJoker no such group found: ' + group)
   }
 
@@ -134,7 +161,7 @@ export function takeJoker(state, playerSeat, group) {
     type: 'takeJoker',
     playerSeat, group
   }
-  return state.update('changes', changes => changes.push(fromJS(change)))
+  return fromJS(change)
 }
 
 export function finishTurn(state, playerSeat, discarded) {
@@ -147,6 +174,10 @@ export function finishTurn(state, playerSeat, discarded) {
   let index = player.get('cards').indexOf(discarded)
   if (index < 0) {
     throw new Error("The card that's about to be discarded is not in player's hand")
+  }
+
+  if (player.get('jokerTaken') !== null) {
+    throw new Error('The joker that had been taken, was not used this turn')
   }
 
   player = player.update('cards', cards => cards.delete(index))
@@ -165,23 +196,39 @@ export function applyChanges(state) {
     players = state.get('players')
 
   changes.forEach(change => {
+    const seat = change.get('playerSeat')
+
     switch (change.get('type')) {
-    case 'meldNew':
+    case 'meldNew': {
       board = board.push(change.get('cards'))
-      players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
-          cards.filter(card => change.get('cards').indexOf(card) < 0)
-        )
+      players = players.updateIn([seat, 'cards'], cards =>
+        cards.filter(card => change.get('cards').indexOf(card) < 0)
+      )
+
+      // If we are putting on the table a joker that we have taken earlier
+      if (change.get('cards').includes(players.getIn([seat, 'jokerTaken']))) {
+        players = players.setIn([seat, 'jokerTaken'], null)
+      }
       break
+    }
 
     case 'meldExisting': {
       const index = findGroupIndex(state, change.get('group').toJS())
       if (index >= 0) {
         board = board.update(index, group =>
-            fromJS(orderGroup(group.concat(change.get('cards')).toJS()))
-          )
-        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
-            cards.filter(card => change.get('cards').indexOf(card) < 0)
-          )
+          fromJS(orderGroup(group.concat(change.get('cards')).toJS()))
+        )
+        players = players.updateIn([seat, 'cards'], cards =>
+          cards.filter(card => change.get('cards').indexOf(card) < 0)
+        )
+
+        // If we are putting on the table a joker that we have taken earlier
+        if (change.get('cards').includes(players.getIn([seat, 'jokerTaken']))) {
+          players = players.setIn([seat, 'jokerTaken'], null)
+        }
+      }
+      else {
+        throw new Error('applyChanges() meldExisting: cannot find group')
       }
       break
     }
@@ -192,20 +239,22 @@ export function applyChanges(state) {
         const position = takeableJokerPosition(board.get(index).toJS())
         const joker = board.getIn([index, position])
         board = board.update(index, group => group.delete(position))
-        players = players.updateIn([change.get('playerSeat'), 'cards'], cards =>
-            cards.push(joker)
-          )
+        players = players
+          .updateIn([seat, 'cards'], cards => cards.push(joker))
+          .setIn([seat, 'jokerTaken'], joker)
+      }
+      else {
+        throw new Error('applyChanges() meldExisting: cannot find group')
       }
       break
     }
     }
+
+    // Update the state on each iteration of the forEach loop
+    state = state.setIn(['cards', 'board'], board).set('players', players)
   })
 
-  changes = changes.clear()
-
-  return state.set('changes', changes)
-    .setIn(['cards', 'board'], board)
-    .set('players', players)
+  return state.update('changes', changes => changes.clear())
 }
 
 export function rollbackChanges(state) {

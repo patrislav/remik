@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import socketIO from 'socket.io'
 import User from './models/user'
 import Room from './models/room'
@@ -12,11 +10,11 @@ import {phases} from '../common/constants'
 
 function dumpError(error) {
   if (error.message) {
-    console.error(error.message)
+    console.error(error.message) // eslint-disable-line no-console
   }
   if (error.stack) {
-    console.error('\nStacktrace\n====================')
-    console.error(error.stack)
+    console.error('\nStacktrace\n====================') // eslint-disable-line no-console
+    console.error(error.stack) // eslint-disable-line no-console
   }
 }
 
@@ -41,7 +39,7 @@ function sockets(server) {
     }
 
     if (user.socketId in io.sockets.connected) {
-      console.error('already connected')
+      dumpError({ message: 'already connected' })
       socket.emit('exception', 'connect', 'already connected')
       socket.disconnect()
     }
@@ -292,13 +290,14 @@ function sockets(server) {
     })
 
     socket.on('game.meld_new', (cards) => {
-      let state = {}
       Room.findOne({ realm, users: user.id })
         .then((room) => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            state = rummy.meldNew(room.getCurrentState(), seat, cards)
-            return room.saveState(state)
+            const change = rummy.meldNew(seat, cards)
+            const realState = room.toState()
+              .update('changes', changes => changes.push(change))
+            return room.saveState(realState)
           }
           else {
             throw new Error("Not player's turn!")
@@ -307,7 +306,7 @@ function sockets(server) {
         .then((room) => {
           let currentState = room.getCurrentState()
 
-          io.to(room.id).emit('game.melded_new', room.id, user.id, currentState.status, state.get('meldedCards'))
+          io.to(room.id).emit('game.melded_new', room.id, user.id, currentState.status)
           emit.gameCards(io.to(room.id), room)
           emit.playerHand(socket, room, user)
         })
@@ -315,13 +314,14 @@ function sockets(server) {
     })
 
     socket.on('game.meld_existing', (group, cards) => {
-      let state = {}
       Room.findOne({ realm, users: user.id })
         .then(room => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            state = rummy.meldExisting(room.getCurrentState(), seat, group, cards)
-            return room.saveState(state)
+            const change = rummy.meldExisting(room.getCurrentState(), seat, group, cards)
+            const realState = room.toState()
+              .update('changes', changes => changes.push(change))
+            return room.saveState(realState)
           }
           else {
             throw new Error("Not player's turn!")
@@ -338,13 +338,14 @@ function sockets(server) {
     })
 
     socket.on('game.take_joker', (group) => {
-      let state = {}
       Room.findOne({ realm, users: user.id})
         .then(room => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            state = rummy.takeJoker(room.getCurrentState(), seat, group)
-            return room.saveState(state)
+            const change = rummy.takeJoker(room.getCurrentState(), seat, group)
+            const realState = room.toState()
+              .update('changes', changes => changes.push(change))
+            return room.saveState(realState)
           }
           else {
             throw new Error("Not player's turn!")
