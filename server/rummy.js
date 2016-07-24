@@ -12,7 +12,7 @@ import {
 export function startGame(state) {
   state = clearBoard(state)
   let stock = shuffle(generateCards(state.get('settings').toJS()))
-  state = dealCards(state.setIn(['cards', 'stock'], fromJS(stock)))
+  state = dealCards(state.setIn(['cards', 'stock'], fromJS(stock)), INITIAL_CARDS)
 
   let status = {
     gameStarted: true,
@@ -164,6 +164,14 @@ export function takeJoker(currentState, playerSeat, group) {
   return fromJS(change)
 }
 
+/**
+ * Finishes the turn of current player by discarding a card from their hand
+ *
+ * @param {Immutable.Map} state The game state
+ * @param {string} playerSeat The player seat's colour
+ * @param {string} discarded The card to be discarded
+ * @returns {Immutable.Map} state
+ */
 export function finishTurn(state, playerSeat, discarded) {
   state = applyChanges(state)
 
@@ -174,6 +182,11 @@ export function finishTurn(state, playerSeat, discarded) {
   let index = player.get('cards').indexOf(discarded)
   if (index < 0) {
     throw new Error("The card that's about to be discarded is not in player's hand")
+  }
+
+  // IDEA: Consider instead treating it as an undo?
+  if (player.get('drewFromDiscard') && player.get('drewFromDiscard') === discarded) {
+    throw new Error('A card that has been taken from the discard pile cannot be discarded again')
   }
 
   if (player.get('jokerTaken') !== null) {
@@ -190,6 +203,12 @@ export function finishTurn(state, playerSeat, discarded) {
     .set('discardedCard', discarded)
 }
 
+/**
+ * Loops over the state.changes list and executes them, saving them in state.
+ *
+ * @param {Immutable.Map} state The current game state
+ * @returns {Immutable.Map} state The resulting state
+ */
 export function applyChanges(state) {
   let changes = state.get('changes'),
     board = state.getIn(['cards', 'board']),
@@ -261,7 +280,14 @@ export function rollbackChanges(state) {
   return state.update('changes', changes => changes.clear())
 }
 
-export function undoLastChange(state) {
+export function undoLastChange(state, seat) {
+  // Put back the card drawn from the discard pile
+  const drewFromDiscard = state.getIn(['players', seat, 'drewFromDiscard'])
+  if (state.get('changes').isEmpty() && drewFromDiscard) {
+    state = state.setIn(['players', seat, 'drewFromDiscard'], null)
+      .updateIn(['cards', 'discard'], pile => pile.push(drewFromDiscard))
+  }
+
   return state.update('changes', changes => changes.pop())
 }
 
@@ -270,22 +296,31 @@ export function findGroupIndex(state, group) {
   return state.getIn(['cards', 'board']).findIndex(g => g.toJS().sort().toString() === group.sort().toString())
 }
 
-// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
-function dealCards(state) {
-  let stock = state.getIn(['cards', 'stock']).toJS(),
-    discard = state.getIn(['cards', 'discard']).toJS(),
-    players = state.get('players').toJS()
-  for (let i = 0; i < INITIAL_CARDS; i++) {
-    for (let seat in players) {
-      players[seat].cards.push(stock.pop())
-    }
+/**
+ * Deals `numCards` of cards to all the players
+ *
+ * @param {Immutable.Map} state The game state
+ * @param {number} numCards The number of cards to deal to each player
+ * @returns {Immutable.Map} state
+ */
+export function dealCards(state, numCards) {
+  let stock = state.getIn(['cards', 'stock'])
+  let discard = state.getIn(['cards', 'discard'])
+  let players = state.get('players')
+
+  for (let i = 0; i < numCards; i++) {
+    players.forEach((player, seat) => {
+      players = players.updateIn([seat, 'cards'], cards => cards.push(stock.last()))
+      stock = stock.pop()
+    })
   }
 
-  discard.push(stock.pop())
+  discard = discard.push(stock.last())
+  stock = stock.pop()
 
-  return state.setIn(['cards', 'stock'], fromJS(stock))
-    .setIn(['cards', 'discard'], fromJS(discard))
-    .set('players', fromJS(players))
+  return state.setIn(['cards', 'stock'], stock)
+    .setIn(['cards', 'discard'], discard)
+    .set('players', players)
 }
 
 function generateCards(settings) {

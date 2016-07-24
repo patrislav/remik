@@ -48,6 +48,42 @@ describe('rummy', () => {
     })
   })
 
+  describe('dealCards()', () => {
+    // 4 players, no cards on the table
+    const playerNum = 4
+    const cardNum = 10
+    let state
+
+    beforeEach(() => {
+      state = fromJS(randomCards(0, 0, playerNum, 0))
+    })
+
+    it('deals a specified number of cards to each player', () => {
+      state = rummy.dealCards(state, cardNum)
+
+      state.get('players').forEach(player => {
+        expect(player)
+          .to.have.property('cards')
+          .that.has.sizeOf(cardNum)
+      })
+    })
+
+    it('puts one card on the discard pile', () => {
+      expect(rummy.dealCards(state, cardNum))
+        .to.have.deep.property(['cards', 'discard'])
+        .that.has.sizeOf(1)
+    })
+
+    it('removes the dealt cards from the stock', () => {
+      const initialStockSize = state.getIn(['cards', 'stock']).size
+      const expectedSize = initialStockSize - playerNum*cardNum - 1
+
+      expect(rummy.dealCards(state, cardNum))
+        .to.have.deep.property(['cards', 'stock'])
+        .that.has.sizeOf(expectedSize)
+    })
+  })
+
   describe('meldNew()', () => {
     // TODO: Add tests!
   })
@@ -474,6 +510,12 @@ describe('rummy', () => {
     })
   })
 
+  describe('simplifyChanges()', () => {
+    it('merges meldNew and meldExisting if they modify the same group')
+    it('merges a meldNew and two meldExisting changes')
+    it("doesn't merge changes that don't modify the same group")
+  })
+
   describe('rollbackChanges()', () => {
     const state = fromJS({
       changes: [{ mock: 'mock' }, { another: 'another' }]
@@ -487,33 +529,85 @@ describe('rummy', () => {
   })
 
   describe('undoLastChange()', () => {
-    it('removes the last change', () => {
+    const seat = 'red'
+
+    describe('when the list of changes is not empty', () => {
       const lastChange = fromJS({ type: 'test', payload: 123 })
+      const drewFromDiscard = 'As.0'
       const state = fromJS({
-        changes: [{ type: 'firstChange', payload: 'data' }, lastChange]
+        changes: [{ type: 'firstChange', payload: 'data' }, lastChange],
+        cards: {
+          discard: []
+        },
+        players: {
+          [seat]: { drewFromDiscard }
+        }
       })
 
-      expect(rummy.undoLastChange(state))
-        .to.have.property('changes')
-        .with.sizeOf(1)
-        .that.not.includes(lastChange)
+      it('removes the last change', () => {
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.property('changes')
+          .with.sizeOf(1)
+          .that.not.includes(lastChange)
+      })
+
+      it('does not change the discard pile', () => {
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['cards', 'discard'])
+          .that.is.empty
+      })
+
+      it('does not change drewFromDiscard', () => {
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['players', seat, 'drewFromDiscard'])
+          .that.is.equal(drewFromDiscard)
+      })
     })
 
-    describe('if the list of changes is empty', () => {
-      const state = fromJS({
-        changes: []
+    describe('when the list of changes is empty', () => {
+      let state
+
+      beforeEach(() => {
+        state = fromJS({
+          changes: [],
+          cards: {
+            discard: []
+          },
+          players: {
+            [seat]: {
+              drewFromDiscard: null
+            }
+          }
+        })
       })
 
-      it("doesn't do anything", () => {
-        expect(rummy.undoLastChange(state))
+      it('keeps the list of changes empty', () => {
+        expect(rummy.undoLastChange(state, seat))
           .to.have.property('changes')
           .that.is.empty
       })
 
       it("doesn't throw any error", () => {
-        expect(() => rummy.undoLastChange(state))
+        expect(() => rummy.undoLastChange(state, seat))
           .to.not.throw(Error)
       })
+
+      it('clears out drewFromDiscard if done this turn', () => {
+        const discarded = 'As.0'
+        state = state.setIn(['players', seat, 'drewFromDiscard'], discarded)
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['players', seat, 'drewFromDiscard'])
+          .that.is.null
+      })
+
+      it('puts back the discarded card on the pile if drewFromDiscard this turn', () => {
+        const discarded = 'As.0'
+        state = state.setIn(['players', seat, 'drewFromDiscard'], discarded)
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['cards', 'discard'])
+          .that.includes(discarded)
+      })
+
     })
   })
 
