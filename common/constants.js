@@ -3,7 +3,8 @@ export const phases = {
   WAITING_FOR_PLAYERS: 0,
   COUNTDOWN: 1,
   CARD_TAKING: 2,
-  BASE_TURN: 3
+  BASE_TURN: 3,
+  GAME_OVER: 4
 }
 export const INITIAL_CARDS = 13
 export const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']

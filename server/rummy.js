@@ -31,7 +31,8 @@ export function stopGame(state) {
     gameStarted: false,
     phase: phases.WAITING_FOR_PLAYERS,
     currentPlayer: null,
-    turnStartedAt: null
+    turnStartedAt: null,
+    winner: null
   }
   return state.set('status', fromJS(status))
 }
@@ -205,11 +206,20 @@ export function finishTurn(state, playerSeat, discarded) {
     .set('drewFromDiscard', null)
   discardPile = discardPile.push(discarded)
 
-  return state.setIn(['players', playerSeat], player)
+  state = state.setIn(['players', playerSeat], player)
     .setIn(['cards', 'discard'], discardPile)
     .setIn(['status', 'currentPlayer'], nextPlayerSeat(playerSeat, players))
     .setIn(['status', 'phase'], phases.CARD_TAKING)
     .set('discardedCard', discarded)
+
+  // Won the game! Congrats!
+  if (player.get('cards').isEmpty()) {
+    state = state.setIn(['status', 'phase'], phases.GAME_OVER)
+      .setIn(['status', 'gameStarted'], false)
+      .setIn(['status', 'winner'], playerSeat)
+  }
+
+  return state
 }
 
 /**

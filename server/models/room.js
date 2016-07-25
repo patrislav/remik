@@ -29,7 +29,8 @@ const Player = (userId) => {
     currentPlayer: null,
     phase: phases.WAITING_FOR_PLAYERS,
     turnStartedAt: null,
-    gameStarted: false
+    gameStarted: false,
+    winner: null
   } },
   cards: { type: Object, default: {
     board: [],

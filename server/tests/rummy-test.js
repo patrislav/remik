@@ -341,7 +341,8 @@ describe('rummy', () => {
     const initialState = fromJS({
       status: {
         currentPlayer: seat,
-        phase: phases.BASE_TURN
+        phase: phases.BASE_TURN,
+        winner: null
       },
       cards: {
         board: [],
@@ -404,6 +405,29 @@ describe('rummy', () => {
       const state = initialState.setIn(['players', seat, 'jokerTaken'], 'X0.0')
       expect(() => rummy.finishTurn(state, seat, discarded))
         .to.throw(Error)
+    })
+
+    describe('when the player has no more cards', () => {
+      it('sets the phase to GAME_OVER', () => {
+        const state = initialState.setIn(['players', seat, 'cards'], List.of(discarded))
+        expect(rummy.finishTurn(state, seat, discarded))
+          .to.have.deep.property(['status', 'phase'])
+          .that.is.equal(phases.GAME_OVER)
+      })
+
+      it('sets gameStarted to false', () => {
+        const state = initialState.setIn(['players', seat, 'cards'], List.of(discarded))
+        expect(rummy.finishTurn(state, seat, discarded))
+          .to.have.deep.property(['status', 'gameStarted'])
+          .that.is.false
+      })
+
+      it('sets the winner property to the current player', () => {
+        const state = initialState.setIn(['players', seat, 'cards'], List.of(discarded))
+        expect(rummy.finishTurn(state, seat, discarded))
+          .to.have.deep.property(['status', 'winner'])
+          .that.is.equal(seat)
+      })
     })
   })
 
