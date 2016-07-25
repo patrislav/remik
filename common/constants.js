@@ -6,6 +6,7 @@ export const phases = {
   BASE_TURN: 3,
   GAME_OVER: 4
 }
+export const MINIMAL_MELD = 51
 export const INITIAL_CARDS = 13
 export const PLAYER_COLOURS = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
 export const RANKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]

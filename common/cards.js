@@ -111,6 +111,54 @@ export function orderGroup(group) {
   return group
 }
 
+// FIXME: This is one ugly function...
+export function groupValue(cards) {
+  const value = cards.reduce((total, card, index, cards) => {
+    const rank = getRank(card)
+
+    // Ace
+    if (rank === 1) {
+      if (getRank(cards[index+1]) === 2
+      || (getRank(cards[index+1]) === 'X' && getRank(cards[index+2]) === 3)) {
+        return parseInt(total + 1)
+      }
+      else {
+        return parseInt(total + 11)
+      }
+    }
+
+    // Joker
+    if (rank === 'X') {
+      // If it's a set
+      const uniqueRanks = unique(cards.map(getRank).filter(rank => rank !== 'X'))
+      if (uniqueRanks.length === 1) {
+        return parseInt(total + uniqueRanks[0])
+      }
+      else if (index === 0) {
+        return parseInt(total + getRank(cards[index+1]) - 1)
+      }
+      else if (index === cards.length-1) {
+        return parseInt(total + getRank(cards[index-1]) + 1)
+      }
+      else {
+        if (getRank(cards[index+1]) === 1) {
+          return parseInt(total + 13)
+        }
+        else if (getRank(cards[index+1]) === 'X') {
+          return parseInt(total + cards[index-1] + 1)
+        }
+        else {
+          return parseInt(total + cards[index+1] -1)
+        }
+      }
+    }
+
+    return parseInt(total + rank)
+  }, 0)
+  console.log('value', cards, value)
+  return value
+}
+
 export function takeableJokerPosition(cards) {
   if (cards.length < 4) {
     return -1

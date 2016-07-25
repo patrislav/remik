@@ -1,11 +1,17 @@
 import {List, fromJS} from 'immutable'
-import {checkGroupValidity, orderGroup, takeableJokerPosition} from '../common/cards'
+import {
+  checkGroupValidity,
+  orderGroup,
+  takeableJokerPosition,
+  groupValue
+} from '../common/cards'
 import {
   phases,
   INITIAL_CARDS,
   PLAYER_COLOURS,
   SUIT_SYMBOLS,
-  RANK_CODES
+  RANK_CODES,
+  MINIMAL_MELD
 } from '../common/constants'
 
 // FIXME: Maybe use the Immutables themselves instead of converting using toJS?
@@ -182,11 +188,17 @@ export function takeJoker(currentState, playerSeat, group) {
  * @returns {Immutable.Map} state
  */
 export function finishTurn(state, playerSeat, discarded) {
-  state = applyChanges(state)
-
   let players = state.get('players'),
     discardPile = state.getIn(['cards', 'discard']),
     player = players.get(playerSeat)
+
+  console.log('finishTurn', player.get('melded'), calculateMeld(state))
+
+  if (!player.get('melded') && !state.get('changes').isEmpty() && calculateMeld(state) < MINIMAL_MELD) {
+    throw new Error('You need 51 points for the initial meld')
+  }
+
+  state = applyChanges(state)
 
   let index = player.get('cards').indexOf(discarded)
   if (index < 0) {
@@ -343,6 +355,16 @@ export function dealCards(state, numCards) {
   return state.setIn(['cards', 'stock'], stock)
     .setIn(['cards', 'discard'], discard)
     .set('players', players)
+}
+
+function calculateMeld(state) {
+  return state.get('changes').reduce((total, change) => {
+    if (change.get('type') !== 'meldNew') {
+      return total
+    }
+
+    return total + groupValue(change.get('cards').toJS())
+  }, 0)
 }
 
 function generateCards(settings) {
