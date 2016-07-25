@@ -365,8 +365,7 @@ function sockets(server) {
         .then(room => {
           let seat = room.getSeatByUserId(user.id)
           if (room.status.currentPlayer === seat && room.status.phase === phases.BASE_TURN) {
-            // console.log(room.getCurrentState().get('changes').toJS())
-            state = rummy.undoLastChange(room.toState())
+            state = rummy.undoLastChange(room.toState(), seat)
             return room.saveState(state)
           }
           else {
@@ -374,10 +373,11 @@ function sockets(server) {
           }
         })
         .then(room => {
-          // console.log(room.getCurrentState().get('changes').toJS())
+          io.to(room.id).emit('game.status', room.id, room.status)
           emit.gameCards(io.to(room.id), room)
           emit.playerHand(socket, room, user)
         })
+        .catch(e => dumpError(e))
     })
 
     socket.on('game.leave', async () => {

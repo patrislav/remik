@@ -50,7 +50,10 @@ export default (state = initialState, action) => {
         .set('hand', initialState.get('hand'))
         .set('cards', initialState.get('cards'))
 
-    // Alternatively, use ADD_HAND_CARDS and REMOVE_HAND_CARDS
+  case actionTypes.game.STATUS:
+    return state.update('status', s => s.merge(action.status))
+
+  // Alternatively, use ADD_HAND_CARDS and REMOVE_HAND_CARDS
   case actionTypes.game.HAND: {
     let newCards = action.cards
         .filter(code => state.get('hand').findIndex(card => card.get('code') === code) < 0)

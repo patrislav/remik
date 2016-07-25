@@ -178,6 +178,15 @@ export function receiveGameStopped(roomId, status) {
   }
 }
 
+export function receiveGameStatus(roomId, status) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.STATUS,
+      roomId, status
+    })
+  }
+}
+
 export function receiveGameHand(roomId, player) {
   const { cards, drewFromDiscard, jokerTaken, melded, madeFirstMove } = player
   return dispatch => {

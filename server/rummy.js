@@ -1,4 +1,4 @@
-import {fromJS} from 'immutable'
+import {List, fromJS} from 'immutable'
 import {checkGroupValidity, orderGroup, takeableJokerPosition} from '../common/cards'
 import {
   phases,
@@ -101,37 +101,45 @@ export function meldExisting(currentState, playerSeat, group, cards) {
   return fromJS(change)
 }
 
-// TODO: More checks!!!
-// FIXME: Maybe use the Immutables themselves instead of converting using toJS?
+/**
+ * Draw a card from either pile to the hand
+ *
+ * @param {Immutable.Map} state The game state
+ * @param {string} playerSeat The player's colour
+ * @param {string} pileName One of: 'stock', 'discard'
+ * @returns {Immutable.Map} state
+ */
 export function drawCard(state, playerSeat, pileName) {
-  let player = state.getIn(['players', playerSeat]).toJS(),
-    stockPile = state.getIn(['cards', 'stock']).toJS(),
-    discardPile = state.getIn(['cards', 'discard']).toJS()
+  let player = state.getIn(['players', playerSeat])
+  let stockPile = state.getIn(['cards', 'stock'])
+  let discardPile = state.getIn(['cards', 'discard'])
 
   let drewCard
   if (pileName === 'stock') {
-    drewCard = stockPile.pop()
+    drewCard = stockPile.last()
+    stockPile = stockPile.pop()
 
     // If the stock is empty, use the shuffled cards from the discard pile
-    if (stockPile.length <= 0) {
-      let lastCard = discardPile.pop()
-      stockPile = shuffle(discardPile.slice())
-      discardPile = [lastCard]
+    if (stockPile.isEmpty()) {
+      let lastCard = discardPile.last()
+      stockPile = fromJS(shuffle(discardPile.pop().toJS()))
+      discardPile = List.of(lastCard)
     }
   }
   else if (pileName === 'discard') {
-    drewCard = discardPile.pop()
-    player.drewFromDiscard = drewCard
+    drewCard = discardPile.last()
+    discardPile = discardPile.pop()
+    player = player.set('drewFromDiscard', drewCard)
   }
   else {
     throw new Error("The pile name must be either 'stock' or 'discard'")
   }
 
-  player.cards.push(drewCard)
+  player = player.update('cards', cards => cards.push(drewCard))
 
-  return state.setIn(['cards', 'stock'], fromJS(stockPile))
-    .setIn(['cards', 'discard'], fromJS(discardPile))
-    .setIn(['players', playerSeat], fromJS(player))
+  return state.setIn(['cards', 'stock'], stockPile)
+    .setIn(['cards', 'discard'], discardPile)
+    .setIn(['players', playerSeat], player)
     .setIn(['status', 'phase'], phases.BASE_TURN)
     .set('drewCard', drewCard)
 }
@@ -194,6 +202,7 @@ export function finishTurn(state, playerSeat, discarded) {
   }
 
   player = player.update('cards', cards => cards.delete(index))
+    .set('drewFromDiscard', null)
   discardPile = discardPile.push(discarded)
 
   return state.setIn(['players', playerSeat], player)
@@ -284,7 +293,10 @@ export function undoLastChange(state, seat) {
   // Put back the card drawn from the discard pile
   const drewFromDiscard = state.getIn(['players', seat, 'drewFromDiscard'])
   if (state.get('changes').isEmpty() && drewFromDiscard) {
-    state = state.setIn(['players', seat, 'drewFromDiscard'], null)
+    state = state
+      .setIn(['status', 'phase'], phases.CARD_TAKING)
+      .setIn(['players', seat, 'drewFromDiscard'], null)
+      .updateIn(['players', seat, 'cards'], cards => cards.filter(c => c !== drewFromDiscard))
       .updateIn(['cards', 'discard'], pile => pile.push(drewFromDiscard))
   }
 

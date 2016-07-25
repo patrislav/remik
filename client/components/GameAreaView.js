@@ -55,7 +55,7 @@ export default class GameAreaView extends Component {
             deck="classic"
             lastCard={this.props.discard}
             onClick={this._onClickDiscard}
-            highlight={this.canDiscard()}
+            highlight={this.canDiscard() || this.canDrawFromDiscard()}
             />
           { this.renderGroups() }
           { this.canAddGroup() && <GroupAdder canAdd={this.canAddGroup()} onClick={this._onAddGroup} /> }
@@ -90,8 +90,8 @@ export default class GameAreaView extends Component {
   }
 
   _onClickDiscard = () => {
-    if (this.props.phase === phases.CARD_TAKING && this.props.isCurrent) {
-      // this.props.onDrawFromDiscard()
+    if (this.canDrawFromDiscard()) {
+      this.props.onDrawFromDiscard()
     }
     else if (this.canDiscard()) {
       this.props.onDiscard(this.getSelected().first().get('code'))
@@ -134,6 +134,10 @@ export default class GameAreaView extends Component {
   canDiscard = () => {
     return this.props.phase === phases.BASE_TURN && this.props.isCurrent
       && this.getSelected().size === 1
+  }
+
+  canDrawFromDiscard = () => {
+    return this.props.phase === phases.CARD_TAKING && this.props.isCurrent
   }
 
   isValidGroup = () => {

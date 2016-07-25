@@ -152,7 +152,86 @@ describe('rummy', () => {
   })
 
   describe('drawCard()', () => {
-    // TODO: Add tests!
+    const seat = 'red'
+    let state
+
+    beforeEach(() => {
+      state = fromJS({
+        cards: {
+          stock: ['2s.0', '3s.0'],
+          discard: ['4s.0', '5s.0']
+        },
+        players: {
+          [seat]: {
+            cards: ['6s.0'],
+            drewFromDiscard: null
+          }
+        }
+      })
+    })
+
+    describe('when the pile is stock', () => {
+      it('pops the card from the stock', () => {
+        expect(rummy.drawCard(state, seat, 'stock'))
+          .to.have.deep.property(['cards', 'stock'])
+          .that.has.sizeOf(1)
+          .and.not.contains('3s.0')
+      })
+
+      it("adds the card to the player's hand", () => {
+        expect(rummy.drawCard(state, seat, 'stock'))
+          .to.have.deep.property(['players', seat, 'cards'])
+          .that.has.sizeOf(2)
+          .and.contains('3s.0')
+      })
+
+      describe('if the stock becomes empty', () => {
+        it('removes all but the top card from the discard pile', () => {
+          state = state.updateIn(['cards', 'stock'], stock => stock.pop())
+          expect(rummy.drawCard(state, seat, 'stock'))
+            .to.have.deep.property(['cards', 'discard'])
+            .that.has.sizeOf(1)
+            .and.contains('5s.0')
+        })
+
+        it('adds the cards from the discard pile to the stock', () => {
+          state = state.updateIn(['cards', 'stock'], stock => stock.pop())
+          expect(rummy.drawCard(state, seat, 'stock'))
+            .to.have.deep.property(['cards', 'stock'])
+            .that.has.sizeOf(1)
+            .and.contains('4s.0')
+        })
+      })
+    })
+
+    describe('when the pile is discard', () => {
+      it('pops the card from the discard pile', () => {
+        expect(rummy.drawCard(state, seat, 'discard'))
+          .to.have.deep.property(['cards', 'discard'])
+          .that.has.sizeOf(1)
+          .and.not.contains('5s.0')
+      })
+
+      it("adds the card to the player's hand", () => {
+        expect(rummy.drawCard(state, seat, 'discard'))
+          .to.have.deep.property(['players', seat, 'cards'])
+          .that.has.sizeOf(2)
+          .and.contains('5s.0')
+      })
+
+      it('sets the drewFromDiscard property', () => {
+        expect(rummy.drawCard(state, seat, 'discard'))
+          .to.have.deep.property(['players', seat, 'drewFromDiscard'])
+          .that.is.equal('5s.0')
+      })
+    })
+
+    describe('when the pile name is invalid', () => {
+      it('throws an error', () => {
+        expect(() => rummy.drawCard(state, seat, 'invalid'))
+          .to.throw(Error)
+      })
+    })
   })
 
   describe('takeJoker()', () => {
@@ -565,17 +644,23 @@ describe('rummy', () => {
     })
 
     describe('when the list of changes is empty', () => {
+      const drewFromDiscard = 'As.0'
       let state
 
       beforeEach(() => {
         state = fromJS({
+          status: {
+            currentPlayer: seat,
+            phase: phases.BASE_TURN
+          },
           changes: [],
           cards: {
             discard: []
           },
           players: {
             [seat]: {
-              drewFromDiscard: null
+              cards: ['2s.0', drewFromDiscard],
+              drewFromDiscard
             }
           }
         })
@@ -593,19 +678,27 @@ describe('rummy', () => {
       })
 
       it('clears out drewFromDiscard if done this turn', () => {
-        const discarded = 'As.0'
-        state = state.setIn(['players', seat, 'drewFromDiscard'], discarded)
         expect(rummy.undoLastChange(state, seat))
           .to.have.deep.property(['players', seat, 'drewFromDiscard'])
           .that.is.null
       })
 
-      it('puts back the discarded card on the pile if drewFromDiscard this turn', () => {
-        const discarded = 'As.0'
-        state = state.setIn(['players', seat, 'drewFromDiscard'], discarded)
+      it('puts back the drewFromDiscard card on the pile', () => {
         expect(rummy.undoLastChange(state, seat))
           .to.have.deep.property(['cards', 'discard'])
-          .that.includes(discarded)
+          .that.contains(drewFromDiscard)
+      })
+
+      it("removes the card from player's hand", () => {
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['players', seat, 'cards'])
+          .that.not.contains(drewFromDiscard)
+      })
+
+      it('changes the phase back to CARD_TAKING', () => {
+        expect(rummy.undoLastChange(state, seat))
+          .to.have.deep.property(['status', 'phase'])
+          .that.is.equal(phases.CARD_TAKING)
       })
 
     })

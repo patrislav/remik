@@ -80,6 +80,10 @@ class Socket {
       actions.receiveGameStopped(roomId, status)
     })
 
+    socket.on('game.status', (roomId, status) => {
+      actions.receiveGameStatus(roomId, status)
+    })
+
     socket.on('game.hand', (roomId, player) => {
       actions.receiveGameHand(roomId, player)
     })
