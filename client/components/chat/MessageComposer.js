@@ -1,10 +1,12 @@
-import React, {Component} from 'react'
-
-import io from '../../socket'
+import React, {Component, PropTypes} from 'react'
 
 const ENTER_KEY_CODE = 13
 
 export default class MessageComposer extends Component {
+  static propTypes = {
+    onChange: PropTypes.func,
+    onSubmit: PropTypes.func,
+  }
 
   constructor() {
     super()
@@ -31,7 +33,10 @@ export default class MessageComposer extends Component {
     this.setState({
       text: event.target.value
     })
-    io.socket.emit('chat.typing')
+
+    if (this.props.onChange) {
+      this.props.onChange()
+    }
   }
 
   _onKeyDown = (event) => {
@@ -44,8 +49,10 @@ export default class MessageComposer extends Component {
   _onSubmit = () => {
     let message = this.state.text.trim()
     if (message) {
-      io.socket.emit('chat.message', message)
       this.setState({ text: '' })
+      if (this.props.onSubmit) {
+        this.props.onSubmit(message)
+      }
     }
   }
 

@@ -1,9 +1,11 @@
-import {Map} from 'immutable'
+import {Map, List} from 'immutable'
 
 import actionTypes from '../actions/actionTypes'
 
 const initialState = Map({
-  messages: []
+  messages: List(),
+  typingUserTimes: Map(),
+  typingUpdatedAt: 0
 })
 
 /**
@@ -18,8 +20,19 @@ export default (state = initialState, action) => {
   case actionTypes.SWITCH_SCREEN:
     return initialState
 
-  case actionTypes.RECEIVE_MESSAGE:
-    return addMessage(state, action.data)
+  case actionTypes.RECEIVE_MESSAGE: {
+    const { user, message } = action
+    return addMessage(state, { user, message })
+      .setIn(['typingUserTimes', user.id], 0)
+      .set('typingUpdatedAt', Date.now())
+  }
+
+  case actionTypes.CHAT_TYPING:
+    return state.setIn(['typingUserTimes', action.userId], action.time)
+      .set('typingUpdatedAt', Date.now())
+
+  case actionTypes.CHAT_TYPING_UPDATE:
+    return state.set('typingUpdatedAt', Date.now())
 
   case actionTypes.room.USER_JOINED:
     return addMessage(state, {
@@ -50,5 +63,5 @@ export default (state = initialState, action) => {
 }
 
 function addMessage(state, data) {
-  return state.set('messages', [...state.get('messages'), data])
+  return state.update('messages', messages => messages.push(data))
 }

@@ -210,7 +210,7 @@ function sockets(server) {
           return
         }
 
-        socket.broadcast.to(room.id).emit('chat.typing', user.id)
+        socket.broadcast.to(room.id).emit('chat.typing', user.id, Date.now())
       }
       catch(e) {
         dumpError(e)

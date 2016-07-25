@@ -60,8 +60,11 @@ class Socket {
     })
 
     socket.on('chat.message', (userId, message) => {
-      let data = { userId, message }
-      actions.receiveChatMessage(data)
+      actions.receiveChatMessage(userId, message)
+    })
+
+    socket.on('chat.typing', (userId, time) => {
+      actions.receiveChatTyping(userId, time)
     })
 
     socket.on('game.user_joined', (roomId, userId, seat) => {

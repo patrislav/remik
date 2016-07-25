@@ -2,7 +2,9 @@
 export default {
   SWITCH_SCREEN: 'switchScreen',
 
-  RECEIVE_MESSAGE: 'receiveMessage',
+  RECEIVE_MESSAGE: 'chat.message',
+  CHAT_TYPING: 'chat.typing',
+  CHAT_TYPING_UPDATE: 'chat.typingUpdate',
   RECEIVE_ME: 'receiveMe',
 
   lobby: {

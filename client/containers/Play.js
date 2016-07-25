@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import Immutable from 'immutable'
 
 import io from '../socket'
 import * as Actions from '../actions'
@@ -13,7 +14,8 @@ import GameView from '../components/GameView'
   user: state.game.get('user'),
   players: state.room.get('players').toJS(),
   playerCards: state.game.getIn(['cards', 'players']).toJS(),
-  currentPlayer: state.game.getIn(['status', 'currentPlayer'])
+  currentPlayer: state.game.getIn(['status', 'currentPlayer']),
+  typingUserTimes: state.chat.get('typingUserTimes')
 }))
 export default class Play extends Component {
   /**
@@ -32,7 +34,8 @@ export default class Play extends Component {
     user: PropTypes.object,
     players: PropTypes.object,
     playerCards: PropTypes.object,
-    currentPlayer: PropTypes.string
+    currentPlayer: PropTypes.string,
+    typingUserTimes: PropTypes.instanceOf(Immutable.Map)
   }
 
   /**
@@ -66,7 +69,10 @@ export default class Play extends Component {
             currentlySitting={this.isSitting()}
             currentPlayer={this.props.currentPlayer}
             />
-          <Chat />
+          <Chat
+            onTyping={this._onChatTyping}
+            onMessage={this._onChatMessage}
+            />
         </aside>
         <main>
           <GameView
@@ -140,5 +146,17 @@ export default class Play extends Component {
 
   _onUndoLast = () => {
     io.socket.emit('game.undo_last')
+  }
+
+  _onChatTyping = () => {
+    const then = this.props.typingUserTimes.get(this.props.user.id)
+    if (!then || Date.now() - then > 1000) {
+      io.socket.emit('chat.typing')
+      this.actions.receiveChatTyping(this.props.user.id, Date.now())
+    }
+  }
+
+  _onChatMessage = (message) => {
+    io.socket.emit('chat.message', message)
   }
 }

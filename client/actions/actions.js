@@ -20,13 +20,21 @@ export function receiveMe(user) {
   }
 }
 
-export function receiveChatMessage(data) {
+export function receiveChatMessage(userId, message) {
   return (dispatch, getState) => {
-    let { userId, message } = data
-    let user = getUser(getState(), userId)
+    const user = getUser(getState(), userId)
     dispatch({
       type: actionTypes.RECEIVE_MESSAGE,
-      data: { user, message }
+      user, message
+    })
+  }
+}
+
+export function receiveChatTyping(userId, time) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: actionTypes.CHAT_TYPING,
+      userId, time
     })
   }
 }
