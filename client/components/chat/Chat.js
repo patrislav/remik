@@ -18,6 +18,7 @@ export default class Chat extends Component {
     typingUsers: PropTypes.instanceOf(Immutable.List).isRequired,
     onTyping: PropTypes.func,
     onMessage: PropTypes.func,
+    dispatch: PropTypes.func
   }
 
   constructor(props) {
