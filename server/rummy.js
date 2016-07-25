@@ -216,7 +216,7 @@ export function finishTurn(state, playerSeat, discarded) {
   if (player.get('cards').isEmpty()) {
     state = state.setIn(['status', 'phase'], phases.GAME_OVER)
       .setIn(['status', 'gameStarted'], false)
-      .setIn(['status', 'winner'], playerSeat)
+      .setIn(['status', 'winner'], player.get('id'))
   }
 
   return state

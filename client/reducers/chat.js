@@ -57,6 +57,11 @@ export default (state = initialState, action) => {
       message: 'The game may now start!'
     })
 
+  case actionTypes.game.OVER:
+    return addMessage(state, {
+      message: `The game was won by ${action.user.firstName}`
+    })
+
   default:
     return state
   }

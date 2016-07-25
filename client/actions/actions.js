@@ -186,6 +186,16 @@ export function receiveGameStopped(roomId, status) {
   }
 }
 
+export function receiveGameOver(roomId, status) {
+  return (dispatch, getState) => {
+    const user = getUser(getState(), status.winner)
+    dispatch({
+      type: actionTypes.game.OVER,
+      roomId, status, user
+    })
+  }
+}
+
 export function receiveGameStatus(roomId, status) {
   return dispatch => {
     dispatch({

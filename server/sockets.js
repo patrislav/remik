@@ -285,6 +285,10 @@ function sockets(server) {
           io.to(room.id).emit('game.discarded', room.id, user.id, room.status, state.get('discardedCard'))
           emit.gameCards(io.to(room.id), room)
           emit.playerHand(socket, room, user)
+
+          if (room.status.phase === phases.GAME_OVER) {
+            io.to(room.id).emit('game.over', room.id, room.status)
+          }
         })
         .catch(e => dumpError(e))
     })

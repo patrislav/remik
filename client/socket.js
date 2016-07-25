@@ -102,6 +102,10 @@ class Socket {
     socket.on('game.discarded', (roomId, userId, status, card) => {
       actions.receiveGameDiscarded(roomId, userId, status, card)
     })
+
+    socket.on('game.over', (roomId, status) => {
+      actions.receiveGameOver(roomId, status)
+    })
   }
 
   get socket() {

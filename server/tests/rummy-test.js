@@ -338,6 +338,7 @@ describe('rummy', () => {
     const discarded = 'As.0'
     const cards = ['2d.1', '3s.0', discarded]
     const seat = 'red', otherSeat = 'blue'
+    const userId = '12345'
     const initialState = fromJS({
       status: {
         currentPlayer: seat,
@@ -350,6 +351,7 @@ describe('rummy', () => {
       },
       players: {
         [seat]: {
+          id: userId,
           cards,
           jokerTaken: null
         },
@@ -422,11 +424,11 @@ describe('rummy', () => {
           .that.is.false
       })
 
-      it('sets the winner property to the current player', () => {
+      it('sets the winner property to the current player ID', () => {
         const state = initialState.setIn(['players', seat, 'cards'], List.of(discarded))
         expect(rummy.finishTurn(state, seat, discarded))
           .to.have.deep.property(['status', 'winner'])
-          .that.is.equal(seat)
+          .that.is.equal(userId)
       })
     })
   })
