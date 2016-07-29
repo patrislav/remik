@@ -192,8 +192,6 @@ export function finishTurn(state, playerSeat, discarded) {
     discardPile = state.getIn(['cards', 'discard']),
     player = players.get(playerSeat)
 
-  console.log('finishTurn', player.get('melded'), calculateMeld(state))
-
   if (!player.get('melded') && !state.get('changes').isEmpty() && calculateMeld(state) < MINIMAL_MELD) {
     throw new Error('You need 51 points for the initial meld')
   }

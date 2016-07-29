@@ -172,7 +172,6 @@ export function groupValue(cards) {
 
     return parseInt(total + (rank > 10 ? 10 : rank))
   }, 0)
-  console.log('value', cards, value)
   return value
 }
 

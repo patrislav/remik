@@ -31,7 +31,7 @@ export function receiveChatMessage(userId, message) {
 }
 
 export function receiveChatTyping(userId, time) {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch({
       type: actionTypes.CHAT_TYPING,
       userId, time
