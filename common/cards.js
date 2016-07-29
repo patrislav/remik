@@ -111,6 +111,70 @@ export function orderGroup(group) {
   return group
 }
 
+// FIXME: This is one ugly function...
+export function groupValue(cards) {
+  const value = cards.reduce((total, card, index, cards) => {
+    const rank = getRank(card)
+
+    // Ace
+    if (rank === 1) {
+      if (getRank(cards[index+1]) === 2
+      || (getRank(cards[index+1]) === 'X' && getRank(cards[index+2]) === 3)) {
+        return parseInt(total + 1)
+      }
+      else {
+        return parseInt(total + 11)
+      }
+    }
+
+    // Joker
+    if (rank === 'X') {
+      let value
+      // If it's a set
+      const uniqueRanks = unique(cards.map(getRank).filter(rank => rank !== 'X'))
+      if (uniqueRanks.length === 1) {
+        if (uniqueRanks[0] === 1) {
+          value = 11
+        }
+        else {
+          value = uniqueRanks[0]
+        }
+      }
+      else if (index === 0) {
+        value = getRank(cards[index+1]) - 1
+        value = value > 10 ? 10 : value
+      }
+      else if (index === cards.length-1) {
+        value = getRank(cards[index-1]) + 1
+        if (value === 14) {
+          value = 11
+        }
+        else if (value > 10) {
+          value = 10
+        }
+      }
+      else {
+        if (getRank(cards[index+1]) === 1) {
+          value = 10
+        }
+        else if (getRank(cards[index+1]) === 'X') {
+          value = getRank(cards[index-1]) + 1
+          value = value > 10 ? 10 : value
+        }
+        else {
+          value = getRank(cards[index+1]) - 1
+          value = value > 10 ? 10 : value
+        }
+      }
+
+      return total + value
+    }
+
+    return parseInt(total + (rank > 10 ? 10 : rank))
+  }, 0)
+  return value
+}
+
 export function takeableJokerPosition(cards) {
   if (cards.length < 4) {
     return -1
@@ -129,6 +193,10 @@ export function takeableJokerPosition(cards) {
 
 
 function getRank(card) {
+  if (!card) {
+    return -1
+  }
+
   let code = card.charAt(0)
   if (code === 'X') {
     return 'X'
