@@ -7,26 +7,11 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_ENV = process.env.NODE_ENV
 const VERBOSE = process.argv.includes('--verbose')
 const DEBUG = (NODE_ENV === 'development')
-const GLOBALS = {
-  __DEV__: DEBUG
-}
-const AUTOPREFIXER_BROWSERS = [
-  'Android 2.3',
-  'Android >= 4',
-  'Chrome >= 35',
-  'Firefox >= 31',
-  'Explorer >= 9',
-  'iOS >= 7',
-  'Opera >= 12',
-  'Safari >= 7.1',
-]
 
 let nodeModules = {}
 fs.readdirSync('node_modules')
-  .filter(function(x) {
-    return ['.bin'].indexOf(x) === -1
-  })
-  .forEach(function(mod) {
+  .filter(x => x !== '.bin')
+  .forEach(mod => {
     nodeModules[mod] = 'commonjs ' + mod
   })
 
