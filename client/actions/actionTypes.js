@@ -36,6 +36,7 @@ export default {
     DREW_CARD: 'game.drewCard',
     DISCARDED: 'game.discarded',
 
-    SELECT_HAND_CARD: 'game.selectHandCard'
+    SELECT_HAND_CARD: 'game.selectHandCard',
+    MOVE_HAND_CARD: 'game.moveHandCard'
   }
 }

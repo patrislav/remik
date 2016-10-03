@@ -80,6 +80,7 @@ export default class Play extends Component {
             onDrawFromDiscard={this._onDrawFromDiscard}
             onDiscard={this._onDiscard}
             onSelectHandCard={this._onSelectHandCard}
+            onMoveHandCard={this._onMoveHandCard}
             onMeldNewGroup={this._onMeldNewGroup}
             onMeldExisting={this._onMeldExisting}
             onTakeJoker={this._onTakeJoker}
@@ -130,6 +131,10 @@ export default class Play extends Component {
 
   _onSelectHandCard = (code) => {
     this.actions.selectHandCard(code)
+  }
+
+  _onMoveHandCard = (dragIndex, hoverIndex) => {
+    this.actions.moveHandCard(dragIndex, hoverIndex)
   }
 
   _onMeldNewGroup = (cards) => {

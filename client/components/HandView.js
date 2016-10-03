@@ -1,9 +1,12 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {DragDropContext} from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
 
 import HandCard from './HandCard'
 import UndoLastButton from './UndoLastButton'
 
+@DragDropContext(HTML5Backend)
 @connect(state => ({
   cards: state.game.get('hand').toJS()
 }))
@@ -11,6 +14,7 @@ export default class HandView extends Component {
   static propTypes = {
     cards: PropTypes.array.isRequired,
     onSelectHandCard: PropTypes.func.isRequired,
+    onMoveHandCard: PropTypes.func.isRequired,
     onUndoLast: PropTypes.func.isRequired
   }
 
@@ -23,11 +27,13 @@ export default class HandView extends Component {
 
     let cardElements = this.props.cards.map(
       (card, index) => <HandCard
-        key={index}
+        key={card.code}
+        index={index}
         deck="classic"
         code={card.code}
         x={offset + parseInt(index) * gutterWidth}
         onClick={this._onClickCard(card.code)}
+        onMove={this.props.onMoveHandCard}
         selected={card.selected}
       />
     )
@@ -39,7 +45,9 @@ export default class HandView extends Component {
             onClick={this._onUndoLast}
           />
         </div>
-        {cardElements}
+        <ul className="handCards">
+          {cardElements}
+        </ul>
       </div>
     )
   }

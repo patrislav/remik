@@ -94,6 +94,17 @@ export default (state = initialState, action) => {
       ))
   }
 
+  // FIXME: After the first remove, the indexes change, so take it into consideration
+  case actionTypes.game.MOVE_HAND_CARD: {
+    const { dragIndex, hoverIndex } = action
+    const dragCard = state.getIn(['hand', dragIndex])
+    return state.update('hand', hand =>
+      hand
+        .remove(dragIndex)
+        .insert(hoverIndex, dragCard)
+      )
+  }
+
   default:
     return state
   }

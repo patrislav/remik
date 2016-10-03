@@ -251,3 +251,12 @@ export function selectHandCard(code) {
     })
   }
 }
+
+export function moveHandCard(dragIndex, moveIndex) {
+  return dispatch => {
+    dispatch({
+      type: actionTypes.game.MOVE_HAND_CARD,
+      dragIndex, moveIndex
+    })
+  }
+}
