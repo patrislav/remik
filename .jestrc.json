@@ -1,0 +1,6 @@
+{
+  "testPathDirs": ["<rootDir>/app"],
+  "moduleNameMapper": {
+    "^.+\\.(css)$": "identity-obj-proxy"
+  }
+}

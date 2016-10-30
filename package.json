@@ -12,8 +12,8 @@
     "clean": "rimraf build/*",
     "start": "webpack-dev-server --port 3000 --host 0.0.0.0 --content-base build/dist/ --history-api-fallback --inline",
     "lint": "eslint ./client",
-    "test": "jest",
-    "test:w": "jest --watch"
+    "test": "jest --config .jestrc.json",
+    "test:w": "jest --config .jestrc.json --watch"
   },
   "author": "Patryk Kalinowski",
   "license": "ISC",
