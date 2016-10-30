@@ -1,0 +1,11 @@
+exports[`<Button /> renders correct UI with default props 1`] = `
+<button
+  onClick={[Function]} />
+`;
+
+exports[`<Button /> renders correct UI with provided label 1`] = `
+<button
+  onClick={[Function]}>
+  LABEL
+</button>
+`;
