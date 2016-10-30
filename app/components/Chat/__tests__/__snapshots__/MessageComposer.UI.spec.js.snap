@@ -1,0 +1,12 @@
+exports[`<MessageComposer /> renders correct UI 1`] = `
+<div>
+  <TextArea
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    value="" />
+  <Button
+    onClick={[Function]}>
+    Send
+  </Button>
+</div>
+`;

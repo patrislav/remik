@@ -1,8 +1,8 @@
 import React from 'react'
-import Counter from '../Counter'
+import Chat from '../Chat'
 
 const App = () => (
-  <Counter />
+  <Chat />
 )
 
 export default App

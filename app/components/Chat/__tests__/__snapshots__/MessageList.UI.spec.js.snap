@@ -1,0 +1,15 @@
+exports[`<MessageList /> renders correct UI when passed a list of messages 1`] = `
+<ul>
+  <li>
+    First message
+  </li>
+  <li>
+    Second message
+  </li>
+  <li>
+    Third message
+  </li>
+</ul>
+`;
+
+exports[`<MessageList /> renders correct UI with default props 1`] = `<ul />`;
