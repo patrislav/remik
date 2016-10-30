@@ -1,9 +1,8 @@
 import React from 'react'
+import Counter from '../Counter'
 
 const App = () => (
-  <div>
-    Hello world!
-  </div>
+  <Counter />
 )
 
 export default App
