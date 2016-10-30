@@ -1,0 +1,11 @@
+exports[`<TextArea /> renders correct UI with default props 1`] = `
+<textarea
+  onChange={[Function]}
+  value="" />
+`;
+
+exports[`<TextArea /> renders correct UI with provided value 1`] = `
+<textarea
+  onChange={[Function]}
+  value="VALUE" />
+`;
