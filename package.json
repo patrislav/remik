@@ -6,7 +6,15 @@
   "name": "remik-game",
   "version": "0.2.0",
   "description": "A Facebook Rummy game",
-  "scripts": {},
+  "scripts": {
+    "build:client": "webpack",
+    "build": "npm run build:client",
+    "clean": "rimraf build/*",
+    "start": "webpack-dev-server --port 3000 --host 0.0.0.0 --content-base build/dist/ --history-api-fallback --inline",
+    "lint": "eslint ./client",
+    "test": "jest",
+    "test:w": "jest --watch"
+  },
   "author": "Patryk Kalinowski",
   "license": "ISC",
   "dependencies": {
@@ -16,6 +24,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.18.0",
+    "babel-eslint": "^7.1.0",
     "babel-jest": "^16.0.0",
     "babel-loader": "^6.2.7",
     "babel-preset-es2015": "^6.18.0",
@@ -34,6 +43,7 @@
     "eslint-plugin-import": "^2.0.1",
     "eslint-plugin-react": "^6.4.1",
     "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.24.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^16.0.2",
     "jest-enzyme": "^2.0.0",
@@ -41,6 +51,7 @@
     "rimraf": "^2.5.4",
     "sinon": "^1.17.6",
     "style-loader": "^0.13.1",
-    "webpack": "^2.1.0-beta.25"
+    "webpack": "^2.1.0-beta.25",
+    "webpack-dev-server": "^1.16.2"
   }
 }
