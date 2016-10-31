@@ -1,10 +1,5 @@
 import { createStore } from './lib/rxstate'
-import rootReducer$ from './modules'
-
-const initialState = {
-  counter: {},
-  chat: {}
-}
+import { rootReducer$, initialState } from './modules'
 
 const store = createStore(rootReducer$, initialState)
 

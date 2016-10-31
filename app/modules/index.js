@@ -1,13 +1,8 @@
-import {Observable} from 'rxjs/Observable'
-import {merge} from 'rxjs/observable/merge'
-import {map} from 'rxjs/operator/map'
+import {combineReducerStreams} from '../lib/rxstate'
 
-import counterReducer$ from './counter/reducer'
-import chatReducer$ from './chat/reducer'
+import counter from './counter/reducer'
+import chat from './chat/reducer'
 
-const rootReducer$ = Observable::merge(
-  counterReducer$::map(reducer => ({ scope: 'counter', reducer })),
-  chatReducer$::map(reducer => ({ scope: 'chat', reducer }))
-)
-
-export default rootReducer$
+export const { rootReducer$, initialState } = combineReducerStreams({
+  counter, chat
+})
