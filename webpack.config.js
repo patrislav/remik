@@ -9,7 +9,11 @@ const cssIdentName = DEBUG ? '[path][name]__[local]' : '[hash:base64]'
 
 let config = {
   entry: {
-    app: path.resolve('app/main.js')
+    app: [
+      'react-hot-loader/patch',
+      'webpack-hot-middleware/client',
+      path.resolve('app/main.js')
+    ]
   },
   output: {
     path: path.resolve('build/dist'),
@@ -48,6 +52,7 @@ let config = {
 
 if (DEBUG) {
   config.plugins = [
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
     ...config.plugins
