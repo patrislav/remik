@@ -18,6 +18,7 @@
   "author": "Patryk Kalinowski",
   "license": "ISC",
   "dependencies": {
+    "keycode": "^2.1.7",
     "lodash": "^4.16.5",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",

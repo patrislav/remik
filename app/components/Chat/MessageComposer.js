@@ -1,8 +1,7 @@
 import React, {PropTypes} from 'react'
+import keycode from 'keycode'
 import Button from '../Button'
 import TextArea from '../TextArea'
-
-const ENTER_KEY_CODE = 13
 
 class MessageComposer extends React.Component {
   static propTypes = {
@@ -43,7 +42,7 @@ class MessageComposer extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (event.keyCode === ENTER_KEY_CODE) {
+    if (event.keyCode === keycode('Enter')) {
       event.preventDefault()
       this.handleCompose()
     }

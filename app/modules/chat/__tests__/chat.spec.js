@@ -16,5 +16,16 @@ describe('chat actions', () => {
         expect(state).toEqual({ messages: [message] })
       })
     })
+
+    it('does not add the message if it is empty', () => {
+      const mockSubscribe = createMockSubscription(reducer$, 'chat')
+      const message = ''
+
+      compose$.next(message)
+
+      return mockSubscribe(state => {
+        expect(state).toEqual({ messages: [] })
+      })
+    })
   })
 })
