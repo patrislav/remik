@@ -1,5 +1,5 @@
 
-export const selectMessagesWithAuthors = (state) =>
-  state.chat.messages && state.chat.messages.map(message =>
-    ({ ...message, author: state.users[message.userId].firstName })
+export const selectMessagesWithAuthors = ({ chat, users }) =>
+  chat.messages && chat.messages.map(message =>
+    ({ ...message, author: users[message.userId].firstName })
   )
