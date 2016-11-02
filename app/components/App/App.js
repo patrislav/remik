@@ -3,7 +3,7 @@ import Chat from '../Chat'
 import InviteList from '../InviteList'
 
 const App = () => (
-  <div>
+  <div style={{ display: 'flex' }}>
     <div style={{ width: 230, height: 320, border: '1px solid blue' }}>
       <InviteList />
     </div>

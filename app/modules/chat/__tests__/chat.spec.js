@@ -1,6 +1,6 @@
 import {createMockSubscription} from '../../../lib/rxstate/testUtils'
 import reducer$ from '../reducer'
-import {compose$} from '../actions'
+import {compose$, addMessage$, clear$} from '../actions'
 import times from 'lodash/times'
 
 console.log = jest.fn()
@@ -36,6 +36,33 @@ describe('chat actions', () => {
       const message = { userId: 'USER_ID', content: ''}
 
       compose$.next(message)
+
+      return mockSubscribe(state => {
+        expect(state).toEqual({ messages: [] })
+      })
+    })
+  })
+
+  describe('addMessage$', () => {
+    it('adds the message to the state', () => {
+      const mockSubscribe = createMockSubscription(reducer$, 'chat')
+      const message = { userId: 'USER_ID', content: 'MESSAGE', timestamp: 'TIMESTAMP' }
+
+      addMessage$.next(message)
+
+      return mockSubscribe(state => {
+        expect(state).toEqual({ messages: [message] })
+      })
+    })
+  })
+
+  describe('clear$', () => {
+    it('clears all the messages', () => {
+      const mockSubscribe = createMockSubscription(reducer$, 'chat')
+      const message = { userId: 'USER_ID', content: 'MESSAGE'}
+
+      addMessage$.next(message)
+      clear$.next()
 
       return mockSubscribe(state => {
         expect(state).toEqual({ messages: [] })
