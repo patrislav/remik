@@ -3,15 +3,21 @@ exports[`<MessageList /> renders correct UI when passed a list of messages 1`] =
   className="list">
   <li
     className="item">
-    First message
+    User #0
+    : 
+    Message #0
   </li>
   <li
     className="item">
-    Second message
+    User #1
+    : 
+    Message #1
   </li>
   <li
     className="item">
-    Third message
+    User #2
+    : 
+    Message #2
   </li>
 </ul>
 `;

@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react'
 import {connect} from '../../lib/rxstate'
 import MessageComposer from './MessageComposer'
 import MessageList from './MessageList'
-import {compose$} from '../../modules/chat'
+import {compose$} from '../../modules/chat/actions'
+import {selectMessagesWithAuthors} from '../../modules/chat/selectors'
 import styles from './Chat.css'
 
 const propTypes = {
@@ -30,6 +31,6 @@ Chat.propTypes = propTypes
 Chat.defaultProps = defaultProps
 
 export default connect(state => ({
-  messages: state.chat.messages,
-  onCompose: message => compose$.next(message),
+  messages: selectMessagesWithAuthors(state),
+  onCompose: content => compose$.next({ userId: 'me', content }),
 }))(Chat)

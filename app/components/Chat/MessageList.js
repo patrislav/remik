@@ -12,7 +12,7 @@ const defaultProps = {
 const MessageList = ({ messages }) => (
   <ul className={styles.list}>
     {messages.map((message, i) =>
-      <li key={i} className={styles.item}>{message}</li>
+      <li key={i} className={styles.item}>{message.author}: {message.content}</li>
     )}
   </ul>
 )
