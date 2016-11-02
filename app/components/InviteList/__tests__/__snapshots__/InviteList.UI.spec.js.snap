@@ -1,0 +1,52 @@
+exports[`<InviteList /> renders correct UI with passed users 1`] = `
+<section
+  className="section">
+  <ul
+    className="list">
+    <li
+      className="item">
+      <InvitableUser
+        onClick={[Function]}
+        user={
+          Object {
+            "id": "0",
+            "name": "User #0",
+            "photoURL": "PHOTO_URL_#0",
+          }
+        } />
+    </li>
+    <li
+      className="item">
+      <InvitableUser
+        onClick={[Function]}
+        user={
+          Object {
+            "id": "1",
+            "name": "User #1",
+            "photoURL": "PHOTO_URL_#1",
+          }
+        } />
+    </li>
+    <li
+      className="item">
+      <InvitableUser
+        onClick={[Function]}
+        user={
+          Object {
+            "id": "2",
+            "name": "User #2",
+            "photoURL": "PHOTO_URL_#2",
+          }
+        } />
+    </li>
+  </ul>
+</section>
+`;
+
+exports[`<InviteList /> renders correct UI without props 1`] = `
+<section
+  className="section">
+  <ul
+    className="list" />
+</section>
+`;

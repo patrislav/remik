@@ -1,0 +1,12 @@
+exports[`<InvitableUser /> renders correct UI 1`] = `
+<button
+  className="wrapper">
+  <img
+    className="photo"
+    src="PHOTO_URL" />
+  <span
+    className="name">
+    NAME
+  </span>
+</button>
+`;

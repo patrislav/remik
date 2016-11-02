@@ -1,0 +1,23 @@
+.wrapper {
+  border: none;
+  padding: 0.3rem;
+  background-color: inherit;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  transition: all 250ms ease-in-out;
+}
+
+.wrapper:hover {
+  background-color: #eee;
+}
+
+.photo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.name {
+  margin-left: 0.3rem;
+}

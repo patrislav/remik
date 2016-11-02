@@ -8,7 +8,10 @@ import styles from './Chat.css'
 
 const propTypes = {
   onCompose: PropTypes.func,
-  messages: PropTypes.array
+  messages: PropTypes.arrayOf(PropTypes.shape({
+    author: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired
+  }))
 }
 
 const defaultProps = {
