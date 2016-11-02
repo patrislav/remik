@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react'
 import keycode from 'keycode'
 import Button from '../Button'
 import TextArea from '../TextArea'
+import styles from './MessageComposer.css'
 
 class MessageComposer extends React.Component {
   static propTypes = {
@@ -19,13 +20,14 @@ class MessageComposer extends React.Component {
   render() {
     const { value } = this.state
     return (
-      <div>
+      <div className={styles.composer}>
         <TextArea
           value={value}
           onChange={::this.handleChange}
           onKeyDown={::this.handleKeyDown}
+          className={styles.input}
         />
-        <Button onClick={::this.handleCompose}>Send</Button>
+        <Button onClick={::this.handleCompose} className={styles.submit}>Send</Button>
       </div>
     )
   }

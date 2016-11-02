@@ -1,10 +1,13 @@
 exports[`<MessageComposer /> renders correct UI 1`] = `
-<div>
+<div
+  className="composer">
   <TextArea
+    className="input"
     onChange={[Function]}
     onKeyDown={[Function]}
     value="" />
   <Button
+    className="submit"
     onClick={[Function]}>
     Send
   </Button>

@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react'
+import styles from './MessageList.css'
 
 const propTypes = {
   messages: PropTypes.array
@@ -9,9 +10,9 @@ const defaultProps = {
 }
 
 const MessageList = ({ messages }) => (
-  <ul>
+  <ul className={styles.list}>
     {messages.map((message, i) =>
-      <li key={i}>{message}</li>
+      <li key={i} className={styles.item}>{message}</li>
     )}
   </ul>
 )

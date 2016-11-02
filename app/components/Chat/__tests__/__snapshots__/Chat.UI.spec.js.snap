@@ -1,8 +1,15 @@
 exports[`<Chat /> renders correct UI 1`] = `
-<section>
-  <MessageList
-    messages={Array []} />
-  <MessageComposer
-    onCompose={[Function]} />
+<section
+  className="chat">
+  <div
+    className="listWrapper">
+    <MessageList
+      messages={Array []} />
+  </div>
+  <div
+    className="composerWrapper">
+    <MessageComposer
+      onCompose={[Function]} />
+  </div>
 </section>
 `;
