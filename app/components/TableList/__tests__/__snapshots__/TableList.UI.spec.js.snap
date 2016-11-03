@@ -1,0 +1,46 @@
+exports[`<TableList /> renders correct UI with passed tables 1`] = `
+<section
+  className="section">
+  <ul
+    className="list">
+    <li
+      className="item">
+      <LobbyTable
+        onClick={[Function]}
+        table={
+          Object {
+            "id": "table_0",
+          }
+        } />
+    </li>
+    <li
+      className="item">
+      <LobbyTable
+        onClick={[Function]}
+        table={
+          Object {
+            "id": "table_1",
+          }
+        } />
+    </li>
+    <li
+      className="item">
+      <LobbyTable
+        onClick={[Function]}
+        table={
+          Object {
+            "id": "table_2",
+          }
+        } />
+    </li>
+  </ul>
+</section>
+`;
+
+exports[`<TableList /> renders correct UI without props 1`] = `
+<section
+  className="section">
+  <ul
+    className="list" />
+</section>
+`;

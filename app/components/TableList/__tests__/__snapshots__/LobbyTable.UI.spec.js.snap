@@ -1,0 +1,7 @@
+exports[`<LobbyTable /> renders correct UI 1`] = `
+<div
+  className="wrapper">
+  Table #
+  ID
+</div>
+`;
