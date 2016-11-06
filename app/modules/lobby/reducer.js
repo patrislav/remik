@@ -1,21 +1,19 @@
-import {Observable} from 'rxjs/Observable'
-import 'rxjs/add/observable/of'
-import {merge} from 'rxjs/operator/merge'
-import {map} from 'rxjs/operator/map'
+import {PUT_TABLE, REMOVE_TABLE} from './actions'
 import omit from 'lodash/omit'
-
-import {putTable$, removeTable$} from './actions'
 
 const initialState = {
   tables: {}
 }
 
-const putTableReducer$ = putTable$
-  ::map(table => state => ({ ...state, tables: { ...state.tables, [table.id]: table } }))
+export default function (state = initialState, action) {
+  switch(action.type) {
+  case PUT_TABLE:
+    return { ...state, tables: { ...state.tables, [action.table.id]: action.table.id } }
 
-const removeTableReducer$ = removeTable$
-  ::map(tableId => state => ({ ...state, tables: omit(state.tables, tableId) }))
+  case REMOVE_TABLE:
+    return { ...state, tables: omit(state.tables, action.tableId) }
 
-export default Observable.of(() => initialState)::merge(
-  putTableReducer$, removeTableReducer$
-)
+  default:
+    return state
+  }
+}

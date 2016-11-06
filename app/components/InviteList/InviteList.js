@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
-import {connect} from '../../lib/rxstate'
-import {selectInvitableUsers} from '../../modules/users/selectors'
+import {connect} from 'react-redux'
 import styles from './InviteList.css'
+import values from 'lodash/values'
 
 import InvitableUser from './InvitableUser'
 
@@ -18,6 +18,10 @@ const defaultProps = {
   onInvite: () => {}
 }
 
+const mapStateToProps = state => ({
+  users: values(state.users)
+})
+
 export const InviteList = ({ users, onInvite }) => (
   <section className={styles.section}>
     <ul className={styles.list}>
@@ -33,6 +37,4 @@ export const InviteList = ({ users, onInvite }) => (
 InviteList.propTypes = propTypes
 InviteList.defaultProps = defaultProps
 
-export default connect(state => ({
-  users: selectInvitableUsers(state)
-}))(InviteList)
+export default connect(mapStateToProps)(InviteList)

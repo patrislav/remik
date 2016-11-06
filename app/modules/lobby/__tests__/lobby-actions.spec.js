@@ -1,47 +1,22 @@
-import {createMockSubscription} from '../../../lib/rxstate/testUtils'
-import reducer$ from '../reducer'
-import {putTable$, removeTable$} from '../actions'
-
-console.log = jest.fn()
+import {
+  PUT_TABLE, putTable,
+  REMOVE_TABLE, removeTable
+} from '../actions'
 
 describe('lobby actions', () => {
-  describe('putTable$', () => {
-    it('adds a table to the state', () => {
-      const mockSubscribe = createMockSubscription(reducer$, 'lobby')
+  describe('putTable()', () => {
+    it('returns the proper action', () => {
       const table = { id: 'ID' }
-
-      putTable$.next(table)
-
-      return mockSubscribe(state => {
-        expect(state.tables).toEqual({ [table.id]: table })
-      })
-    })
-
-    it('updates an existing table', () => {
-      const table = { id: 'ID' }
-      const tableChanged = { id: 'ID' }
-      const initialState = { [table.id]: table }
-      const mockSubscribe = createMockSubscription(reducer$, 'lobby', initialState)
-
-      putTable$.next(tableChanged)
-
-      return mockSubscribe(state => {
-        expect(state.tables).toEqual({ [tableChanged.id]: tableChanged })
-      })
+      const action = { type: PUT_TABLE, table }
+      expect(putTable(table)).toEqual(action)
     })
   })
 
-  describe('removeTable$', () => {
-    it('removes a table from the state', () => {
-      const table = { id: 'ID' }
-      const initialState = { [table.id]: table }
-      const mockSubscribe = createMockSubscription(reducer$, 'lobby', initialState)
-
-      removeTable$.next(table.id)
-
-      return mockSubscribe(state => {
-        expect(state.tables).toEqual({})
-      })
+  describe('removeTable()', () => {
+    it('returns the proper action', () => {
+      const tableId = 'ID'
+      const action = { type: REMOVE_TABLE, tableId }
+      expect(removeTable(tableId)).toEqual(action)
     })
   })
 })

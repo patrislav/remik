@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {StateProvider} from './lib/rxstate'
+import { Provider } from 'react-redux'
 
 import { AppContainer } from 'react-hot-loader'
 import RootContainer from './containers/RootContainer'
@@ -10,9 +10,9 @@ const mountNode = document.getElementById('root')
 const render = Container => {
   ReactDOM.render((
     <AppContainer>
-      <StateProvider store={store}>
+      <Provider store={store}>
         <Container />
-      </StateProvider>
+      </Provider>
     </AppContainer>
   ), mountNode)
 }

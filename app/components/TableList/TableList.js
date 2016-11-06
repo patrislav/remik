@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
-import {connect} from '../../lib/rxstate'
-import {selectLobbyTables} from '../../modules/lobby/selectors'
+import {connect} from 'react-redux'
 import styles from './TableList.css'
+import values from 'lodash/values'
 
 import LobbyTable from './LobbyTable'
 
@@ -16,6 +16,10 @@ const defaultProps = {
   tables: [],
   onJoin: () => {}
 }
+
+const mapStateToProps = state => ({
+  tables: values(state.lobby.tables)
+})
 
 export const TableList = ({ tables, onJoin }) => (
   <section className={styles.section}>
@@ -32,6 +36,4 @@ export const TableList = ({ tables, onJoin }) => (
 TableList.propTypes = propTypes
 TableList.defaultProps = defaultProps
 
-export default connect(state => ({
-  tables: selectLobbyTables(state)
-}))(TableList)
+export default connect(mapStateToProps)(TableList)

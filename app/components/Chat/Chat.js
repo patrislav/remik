@@ -1,9 +1,10 @@
 import React, {PropTypes} from 'react'
-import {connect} from '../../lib/rxstate'
+import {connect} from 'react-redux'
 import MessageComposer from './MessageComposer'
 import MessageList from './MessageList'
-import {compose$} from '../../modules/chat/actions'
+import {composeMessage} from '../../modules/chat'
 import {selectMessagesWithAuthors} from '../../modules/chat/selectors'
+
 import styles from './Chat.css'
 
 const propTypes = {
@@ -19,6 +20,14 @@ const defaultProps = {
   messages: []
 }
 
+const mapStateToProps = state => ({
+  messages: selectMessagesWithAuthors(state)
+})
+
+const mapDispatchToProps = dispatch => ({
+  onCompose: content => dispatch(composeMessage(content))
+})
+
 export const Chat = ({ onCompose, messages }) => (
   <section className={styles.chat}>
     <div className={styles.listWrapper}>
@@ -33,7 +42,4 @@ export const Chat = ({ onCompose, messages }) => (
 Chat.propTypes = propTypes
 Chat.defaultProps = defaultProps
 
-export default connect(state => ({
-  messages: selectMessagesWithAuthors(state),
-  onCompose: content => compose$.next({ userId: 'me', content }),
-}))(Chat)
+export default connect(mapStateToProps, mapDispatchToProps)(Chat)

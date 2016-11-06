@@ -1,6 +1,5 @@
-import { actionCreator } from '../../lib/rxstate'
+export const PUT_TABLE = 'lobby/PUT_TABLE'
+export const REMOVE_TABLE = 'lobby/REMOVE_TABLE'
 
-const action = actionCreator('lobby')
-
-export const putTable$ = action('putTable')
-export const removeTable$ = action('removeTable')
+export const putTable = table => ({ type: PUT_TABLE, table })
+export const removeTable = tableId => ({ type: REMOVE_TABLE, tableId })

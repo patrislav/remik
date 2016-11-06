@@ -1,6 +1,5 @@
-import { actionCreator } from '../../lib/rxstate'
+export const PUT_USER = 'users/PUT_USER'
+export const REMOVE_USER = 'users/REMOVE_USER'
 
-const action = actionCreator('users')
-
-export const putUser$ = action('putUser')
-export const removeUser$ = action('removeUser')
+export const putUser = (user) => ({ type: PUT_USER, user })
+export const removeUser = (userId) => ({ type: REMOVE_USER, userId })

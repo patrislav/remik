@@ -1,9 +1,15 @@
-import {combineReducerStreams} from '../lib/rxstate'
+import { combineReducers } from 'redux'
+import { combineEpics } from 'redux-observable'
 
-import chat from './chat/reducer'
-import users from './users/reducer'
-import lobby from './lobby/reducer'
+import auth from './auth'
+import chat, {chatEpic} from './chat'
+import lobby from './lobby'
+import users from './users'
 
-export const { rootReducer$, initialState } = combineReducerStreams({
-  chat, users, lobby
+export const rootReducer = combineReducers({
+  auth, chat, lobby, users
 })
+
+export const rootEpic = combineEpics(
+  chatEpic
+)
