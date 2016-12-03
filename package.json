@@ -22,6 +22,7 @@
     "keycode": "^2.1.7",
     "lodash": "^4.16.5",
     "react": "^15.3.2",
+    "react-custom-scrollbars": "^4.0.0",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "redux": "^3.6.0",

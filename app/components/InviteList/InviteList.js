@@ -1,9 +1,10 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
-import styles from './InviteList.css'
+import {Scrollbars} from 'react-custom-scrollbars'
 import values from 'lodash/values'
-
 import InvitableUser from './InvitableUser'
+
+import styles from './InviteList.css'
 
 const propTypes = {
   users: PropTypes.arrayOf(PropTypes.shape({
@@ -24,13 +25,15 @@ const mapStateToProps = state => ({
 
 export const InviteList = ({ users, onInvite }) => (
   <section className={styles.section}>
-    <ul className={styles.list}>
-      {users.map(user =>
-        <li key={user.id} className={styles.item}>
-          <InvitableUser user={user} onClick={() => onInvite(user.id)} />
-        </li>
-      )}
-    </ul>
+    <Scrollbars>
+      <ul className={styles.list}>
+        {users.map(user =>
+          <li key={user.id} className={styles.item}>
+            <InvitableUser user={user} onClick={() => onInvite(user.id)} />
+          </li>
+        )}
+      </ul>
+    </Scrollbars>
   </section>
 )
 
